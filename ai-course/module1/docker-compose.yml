@@ -17,5 +17,24 @@ services:
       # Persist data across container restarts
       - mysql_data:/var/lib/mysql
 
+  config-service:
+    image: node:20
+    container_name: config_service_dev
+    working_dir: /workspace
+    volumes:
+      - ./config-service:/workspace
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=my_user
+      - DB_PASSWORD=my_password
+      - DB_NAME=sample_db
+      - PORT=3000
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - db
+
 volumes:
   mysql_data:
