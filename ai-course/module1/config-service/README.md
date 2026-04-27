@@ -48,19 +48,17 @@ cd ..
 docker-compose up -d
 ```
 
-### 4. Run database migrations
+### 4. Verify database data
 
-Connect to MySQL and run the migrations:
-
-```bash
-docker exec -i mysql_sample mysql -umy_user -pmy_password sample_db < config-service/migrations.sql
-```
-
-Or use a MySQL client:
+To test that the database is set up correctly and contains the expected data, run this command:
 
 ```bash
-mysql -h localhost -P 3306 -u my_user -pmy_password sample_db < migrations.sql
+docker exec -it mysql_sample mysql -u my_user -p sample_db -e "SELECT * FROM configurations;"
 ```
+
+Enter the password when prompted.
+
+You should see output showing the sample configurations (app_name, max_connections, debug_mode).
 
 ### 5. Configure environment variables
 
@@ -104,6 +102,46 @@ npm test
 ```bash
 npm run test:watch
 ```
+
+## Docker Commands
+
+### Start the MySQL database
+
+```bash
+docker-compose up -d
+```
+
+### Stop the MySQL database
+
+```bash
+docker-compose down
+```
+
+### View database logs
+
+```bash
+docker-compose logs
+```
+
+### Restart the database
+
+```bash
+docker-compose restart
+```
+
+### Remove database and volumes (⚠️ This deletes all data)
+
+```bash
+docker-compose down -v
+```
+
+### Access MySQL shell inside container
+
+```bash
+docker exec -it mysql_sample mysql -u my_user -p sample_db
+```
+
+Enter the password when prompted (default: `my_password`).
 
 ## API Endpoints
 

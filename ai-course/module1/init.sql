@@ -1,12 +1,18 @@
 CREATE DATABASE IF NOT EXISTS sample_db;
 USE sample_db;
 
-CREATE TABLE IF NOT EXISTS users (
+-- Create configurations table
+CREATE TABLE IF NOT EXISTS configurations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100),
-    email VARCHAR(100)
+    `key` VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (name, email) VALUES 
-('Alice Smith', 'alice@example.com'),
-('Bob Johnson', 'bob@example.com');
+-- Insert sample configurations
+INSERT INTO configurations (`key`, value, description) VALUES
+('app_name', 'Config Service', 'Application name'),
+('max_connections', '100', 'Maximum number of database connections'),
+('debug_mode', 'false', 'Enable or disable debug mode');
