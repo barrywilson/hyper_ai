@@ -1,0 +1,21 @@
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_sample
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: my_user
+      MYSQL_PASSWORD: my_password
+    ports:
+      - "3306:3306"
+    volumes:
+      # Mount the initialization script
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Persist data across container restarts
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
