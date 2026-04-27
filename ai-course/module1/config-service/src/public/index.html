@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Service</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Configuration Service</h1>
+            <p>Manage your application configurations</p>
+        </header>
+
+        <main>
+            <!-- Configuration Form -->
+            <section class="form-section">
+                <h2 id="form-title">Add New Configuration</h2>
+                <form id="config-form">
+                    <input type="hidden" id="config-id">
+                    
+                    <div class="form-group">
+                        <label for="config-key">Key *</label>
+                        <input type="text" id="config-key" required placeholder="e.g., app_name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="config-value">Value *</label>
+                        <textarea id="config-value" required placeholder="Configuration value"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="config-description">Description</label>
+                        <input type="text" id="config-description" placeholder="Optional description">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Add Configuration</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-btn" style="display: none;">Cancel</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Configurations Table -->
+            <section class="table-section">
+                <h2>Configurations</h2>
+                <div id="message" class="message"></div>
+                <div id="loading" class="loading" style="display: none;">Loading...</div>
+                
+                <div class="table-wrapper">
+                    <table id="config-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Key</th>
+                                <th>Value</th>
+                                <th>Description</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="config-tbody">
+                            <!-- Configurations will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
