@@ -1,9 +1,9 @@
 
 
 
-- node.js
-- node
+- node.js for backend
+- javascript,css,html for frontend
 - json apis, request and response json
-- mysql with jenkins
-- direct sql, maybe jenkins
-- jest 
+- mysql in docker container
+- direct sql
+- jest for testing
