@@ -7,21 +7,6 @@ let testConfigId;
 
 describe('Configuration API Tests', () => {
   
-  // Clean up test data before all tests
-  beforeAll(async () => {
-    // Create test table if needed
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS configurations (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        \`key\` VARCHAR(255) UNIQUE NOT NULL,
-        value TEXT NOT NULL,
-        description TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
-  });
-
   // Clean up after all tests
   afterAll(async () => {
     await pool.end();

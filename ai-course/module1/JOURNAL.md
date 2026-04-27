@@ -33,7 +33,9 @@ follow the instructions in 1-web-api-specs.md in prompts
 - supertest (API testing - dev)
 
 ### Next Steps:
-- Run `npm start` in config-service directory to start the server
+- Navigate to `ai-course/module1/config-service` directory
+- Run `npm install` to install dependencies (if not already done)
+- Run `npm start` to start the server
 - Access web interface at http://localhost:3000
 - Run `npm test` to execute test suite
 
@@ -41,3 +43,5 @@ follow the instructions in 1-web-api-specs.md in prompts
 - Database column changed from `key` to `key_name` to avoid MySQL reserved word
 - All CRUD operations implemented and tested
 - Frontend provides full configuration management interface
+- **Project organized in ai-course/module1/ directory structure**
+- Dependencies already installed during initial setup
