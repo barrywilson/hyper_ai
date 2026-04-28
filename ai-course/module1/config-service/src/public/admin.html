@@ -505,7 +505,7 @@
     <script src="config-client.js"></script>
     <script>
         // Initialize Configuration Service client
-        const configClient = createConfigClient('/api/config');
+        const configClient = createApi('/api/config');
 
         let allConfigs = [];
 
@@ -545,7 +545,7 @@
             messageEl.style.display = 'none';
             
             try {
-                allConfigs = await configClient.list();
+                allConfigs = await configClient('GET');
                 renderConfigs(allConfigs);
                 updateStats();
             } catch (error) {

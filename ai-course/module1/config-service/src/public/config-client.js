@@ -1,22 +1,34 @@
 /**
- * Configuration Service Client Library
+ * Configuration Service Client
  * 
- * Simple client for the Configuration Service API.
+ * Modern unified API pattern - single endpoint handler
  * 
  * Usage:
- *   const client = createConfigClient('/api/configs');
- *   const configs = await client.list();
- *   await client.create({ key_name: 'app_name', value: 'MyApp' });
+ *   const api = createApi('/api/configs');
+ *   const configs = await api('GET');
+ *   const config = await api('GET', { id: 1 });
+ *   await api('POST', { data: { key_name: 'app', value: 'MyApp' } });
+ *   await api('PUT', { id: 1, data: { value: 'Updated' } });
+ *   await api('DELETE', { id: 1 });
  */
 
-function createConfigClient(baseUrl = '/api/configs') {
+function createApi(baseUrl = '/api/config') {
   baseUrl = baseUrl.replace(/\/$/, '');
 
-  async function request(path, options = {}) {
-    const response = await fetch(baseUrl + path, {
-      headers: { 'Content-Type': 'application/json' },
-      ...options
-    });
+  return async function api(method, params = {}) {
+    const { id, data } = params;
+    const url = id ? `${baseUrl}/${id}` : baseUrl;
+    
+    const options = {
+      method,
+      headers: { 'Content-Type': 'application/json' }
+    };
+    
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(url, options);
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
@@ -25,37 +37,12 @@ function createConfigClient(baseUrl = '/api/configs') {
 
     if (response.status === 204) return null;
     return response.json();
-  }
-
-  return {
-    list: () => request(''),
-    
-    get: (id) => request(`/${id}`),
-    
-    getByKey: async (keyName) => {
-      const configs = await request('');
-      return configs.find(c => c.key_name === keyName) || null;
-    },
-    
-    create: (data) => request('', {
-      method: 'POST',
-      body: JSON.stringify(data)
-    }),
-    
-    update: (id, data) => request(`/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data)
-    }),
-    
-    delete: (id) => request(`/${id}`, {
-      method: 'DELETE'
-    })
   };
 }
 
-// Export for different environments
+// Export
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = createConfigClient;
+  module.exports = createApi;
 } else if (typeof window !== 'undefined') {
-  window.createConfigClient = createConfigClient;
+  window.createApi = createApi;
 }

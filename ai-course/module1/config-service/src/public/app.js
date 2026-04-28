@@ -2,11 +2,11 @@
  * Configuration Service Web App
  * 
  * Simple web interface for managing configurations.
- * Uses the Configuration Client library for API communication.
+ * Uses unified API pattern for all requests.
  */
 
-// Initialize Configuration Service client
-const configClient = createConfigClient('/api/config');
+// Initialize API
+const api = createApi('/api/config');
 
 // DOM Elements
 const configForm = document.getElementById('config-form');
@@ -46,7 +46,7 @@ async function loadConfigurations() {
         showLoading(true);
         hideMessage();
         
-        const configurations = await configClient.list();
+        const configurations = await api('GET');
         renderConfigurations(configurations);
         
     } catch (error) {
@@ -108,17 +108,22 @@ async function handleFormSubmit(e) {
         if (isEditing) {
             // Update existing configuration
             const id = parseInt(configId.value);
-            await configClient.update(id, {
-                value,
-                description: description || null
+            await api('PUT', {
+                id,
+                data: {
+                    value,
+                    description: description || null
+                }
             });
             showMessage('Configuration updated successfully', 'success');
         } else {
             // Create new configuration
-            await configClient.create({
-                key_name: keyName,
-                value,
-                description: description || null
+            await api('POST', {
+                data: {
+                    key_name: keyName,
+                    value,
+                    description: description || null
+                }
             });
             showMessage('Configuration created successfully', 'success');
         }
@@ -136,7 +141,7 @@ async function handleFormSubmit(e) {
  */
 async function editConfiguration(id) {
     try {
-        const config = await configClient.get(id);
+        const config = await api('GET', { id });
         
         configId.value = config.id;
         configKey.value = config.key_name;
@@ -167,7 +172,7 @@ async function deleteConfiguration(id) {
     }
     
     try {
-        await configClient.delete(id);
+        await api('DELETE', { id });
         showMessage('Configuration deleted successfully', 'success');
         loadConfigurations();
     } catch (error) {
