@@ -51,24 +51,7 @@
 
             <!-- Configurations Table -->
             <div class="table-wrapper">
-                <table id="configTable">
-                    <thead>
-                        <tr>
-                            <th>Key Name</th>
-                            <th>Value</th>
-                            <th>Description</th>
-                            <th>Updated</th>
-                            <th style="text-align: center;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="configBody">
-                        <!-- Rows will be populated here -->
-                    </tbody>
-                </table>
-                <div id="emptyState" class="empty-state" style="display: none;">
-                    <h3>No configurations found</h3>
-                    <p>Create your first configuration to get started</p>
-                </div>
+                <config-table id="config-table"></config-table>
             </div>
         </main>
 
@@ -87,8 +70,8 @@
                 <input type="hidden" id="configId">
                 
                 <div class="form-group">
-                    <label for="keyName">Key Name *</label>
-                    <input type="text" id="keyName" required placeholder="e.g., app_name">
+                    <label for="key">Key Name *</label>
+                    <input type="text" id="key" required placeholder="e.g., app_name">
                 </div>
 
                 <div class="form-group">
@@ -110,6 +93,7 @@
     </div>
 
     <script src="api-client.js"></script>
+    <script src="elements/config-table.js"></script>
     <script>
         // Initialize API with resolver pattern
         const api = createApi({
@@ -123,8 +107,7 @@
         // DOM Elements
         const configModal = document.getElementById('configModal');
         const configForm = document.getElementById('configForm');
-        const configBody = document.getElementById('configBody');
-        const emptyState = document.getElementById('emptyState');
+        const configTable = document.getElementById('config-table');
         const messageEl = document.getElementById('message');
         const loadingEl = document.getElementById('loading');
         const searchInput = document.getElementById('searchInput');
@@ -145,6 +128,16 @@
             configForm.addEventListener('submit', handleFormSubmit);
             searchInput.addEventListener('input', filterConfigs);
             
+            // Listen for config-action events
+            document.addEventListener('config-action', (e) => {
+                const { action, id } = e.detail;
+                if (action === 'edit') {
+                    openEditModal(id);
+                } else if (action === 'delete') {
+                    deleteConfig(id);
+                }
+            });
+            
             // Close modal on outside click
             window.addEventListener('click', (e) => {
                 if (e.target === configModal) closeModal();
@@ -157,7 +150,7 @@
             
             try {
                 allConfigs = await api('list');
-                renderConfigs(allConfigs);
+                configTable.data = allConfigs;
                 updateStats();
             } catch (error) {
                 showMessage('Error loading configurations: ' + error.message, 'error');
@@ -166,43 +159,12 @@
             }
         }
 
-        function renderConfigs(configs) {
-            configBody.innerHTML = '';
-            
-            if (configs.length === 0) {
-                emptyState.style.display = 'block';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            
-            configs.forEach(config => {
-                const row = document.createElement('tr');
-                const updatedDate = new Date(config.updated_at).toLocaleDateString();
-                
-                row.innerHTML = `
-                    <td class="key-name">${escapeHtml(config.key_name)}</td>
-                    <td class="value-cell">${escapeHtml(config.value || '—')}</td>
-                    <td>${escapeHtml(config.description || '—')}</td>
-                    <td>${updatedDate}</td>
-                    <td style="text-align: center;">
-                        <div class="actions">
-                            <button class="btn btn-edit" onclick="openEditModal(${config.id})">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteConfig(${config.id})">Delete</button>
-                        </div>
-                    </td>
-                `;
-                
-                configBody.appendChild(row);
-            });
-        }
-
         function filterConfigs() {
             const query = searchInput.value.toLowerCase();
             const filtered = allConfigs.filter(config => 
-                config.key_name.toLowerCase().includes(query)
+                config.key.toLowerCase().includes(query)
             );
-            renderConfigs(filtered);
+            configTable.data = filtered;
         }
 
         function openAddModal() {
@@ -210,7 +172,7 @@
             configForm.reset();
             document.getElementById('configId').value = '';
             configModal.classList.add('active');
-            document.getElementById('keyName').focus();
+            document.getElementById('key').focus();
         }
 
         async function openEditModal(id) {
@@ -219,8 +181,8 @@
             
             document.getElementById('modalTitle').textContent = 'Edit Configuration';
             document.getElementById('configId').value = config.id;
-            document.getElementById('keyName').value = config.key_name;
-            document.getElementById('keyName').disabled = true;
+            document.getElementById('key').value = config.key;
+            document.getElementById('key').disabled = true;
             document.getElementById('configValue').value = config.value;
             document.getElementById('description').value = config.description || '';
             
@@ -231,18 +193,18 @@
         function closeModal() {
             configModal.classList.remove('active');
             configForm.reset();
-            document.getElementById('keyName').disabled = false;
+            document.getElementById('key').disabled = false;
         }
 
         async function handleFormSubmit(e) {
             e.preventDefault();
             
             const id = document.getElementById('configId').value;
-            const keyName = document.getElementById('keyName').value.trim();
+            const key = document.getElementById('key').value.trim();
             const value = document.getElementById('configValue').value.trim();
             const description = document.getElementById('description').value.trim();
             
-            if (!keyName || !value) {
+            if (!key || !value) {
                 showMessage('Key name and value are required', 'error');
                 return;
             }
@@ -257,7 +219,7 @@
                     showMessage('Configuration updated successfully!', 'success');
                 } else {
                     await api('create', {
-                        key_name: keyName,
+                        key_name: key,
                         value,
                         description: description || null
                     });
@@ -301,17 +263,7 @@
                 setTimeout(() => messageEl.style.display = 'none', 4000);
             }
         }
-
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
+        
     </script>
 </body>
 </html>

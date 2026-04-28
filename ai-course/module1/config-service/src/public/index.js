@@ -21,7 +21,7 @@ const configDescription = document.getElementById('config-description');
 const submitBtn = document.getElementById('submit-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 const formTitle = document.getElementById('form-title');
-const messageDiv = document.getElementById('message');
+const message = document.getElementById('message');
 const loadingDiv = document.getElementById('loading');
 
 // State
@@ -58,7 +58,7 @@ function setupEventListeners() {
 async function loadConfigurations() {
     try {
         showLoading(true);
-        hideMessage();
+        message.hide();
         
         const configurations = await configApi('list');
         console.log('Loaded configurations:', configurations);
@@ -68,7 +68,7 @@ async function loadConfigurations() {
         
     } catch (error) {
         console.error('Error loading configurations:', error);
-        showMessage('Failed to load configurations: ' + error.message, 'error');
+        message.show('Failed to load configurations: ' + error.message, 'error');
     } finally {
         showLoading(false);
     }
@@ -85,7 +85,7 @@ async function handleFormSubmit(e) {
     const description = configDescription.value.trim();
     
     if (!keyName || !value) {
-        showMessage('Key name and value are required', 'error');
+        message.show('Key name and value are required', 'error');
         return;
     }
     
@@ -98,7 +98,7 @@ async function handleFormSubmit(e) {
                 value,
                 description: description || null
             });
-            showMessage('Configuration updated successfully', 'success');
+            message.show('Configuration updated successfully', 'success');
         } else {
             // Create new configuration
             await configApi('create', {
@@ -106,14 +106,14 @@ async function handleFormSubmit(e) {
                 value,
                 description: description || null
             });
-            showMessage('Configuration created successfully', 'success');
+            message.show('Configuration created successfully', 'success');
         }
         
         resetForm();
         loadConfigurations();
     } catch (error) {
         console.error('Error saving configuration:', error);
-        showMessage(error.message, 'error');
+        message.show(error.message, 'error');
     }
 }
 
@@ -139,7 +139,7 @@ async function editConfiguration(id) {
         configValue.focus();
     } catch (error) {
         console.error('Error loading configuration:', error);
-        showMessage(error.message, 'error');
+        message.show(error.message, 'error');
     }
 }
 
@@ -153,11 +153,11 @@ async function deleteConfiguration(id) {
     
     try {
         await configApi('delete', { id });
-        showMessage('Configuration deleted successfully', 'success');
+        message.show('Configuration deleted successfully', 'success');
         loadConfigurations();
     } catch (error) {
         console.error('Error deleting configuration:', error);
-        showMessage(error.message, 'error');
+        message.show(error.message, 'error');
     }
 }
 
@@ -172,7 +172,7 @@ function resetForm() {
     formTitle.textContent = 'Add New Configuration';
     submitBtn.textContent = 'Add Configuration';
     cancelBtn.style.display = 'none';
-    hideMessage();
+    message.hide();
 }
 
 /**
@@ -182,22 +182,3 @@ function showLoading(show) {
     loadingDiv.style.display = show ? 'block' : 'none';
 }
 
-/**
- * Show message (success or error)
- */
-function showMessage(text, type) {
-    messageDiv.textContent = text;
-    messageDiv.className = `message ${type}`;
-    
-    if (type === 'success') {
-        setTimeout(hideMessage, 5000);
-    }
-}
-
-/**
- * Hide message
- */
-function hideMessage() {
-    messageDiv.className = 'message';
-    messageDiv.textContent = '';
-}
