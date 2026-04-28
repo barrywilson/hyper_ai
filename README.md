@@ -30,8 +30,8 @@ A modern, elegant API service for managing application configurations using the 
 - **Backend**: Node.js, Express
 - **Frontend**: HTML, CSS, Vanilla JavaScript (Custom Elements)
 - **Database**: MySQL 8.0 (Docker)
-- **Testing**: Jest, Supertest
-- **Architecture**: API Resolver Pattern
+- **Testing**: Jest
+- **API Architecture**: API Resolver Pattern
 
 ## Prerequisites
 
