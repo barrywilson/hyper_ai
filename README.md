@@ -1,6 +1,6 @@
-# Configuration Service API
+# Cool AI built API
 
-A modern, elegant API service for managing application configurations using the **API Resolver Pattern**. Built with Node.js, Express, MySQL, and vanilla JavaScript custom elements.
+A modern, elegant API service for managing application configurations using the **API Resolver Pattern**. Built with Node.js, Express, MySQL, and vanilla JavaScript custom elements and to top it off leveraging containerisation to run mysql, node in containers.  This makes testing so much easier, integration, social tests are a no brainer when setup is ephemeral.
 
 ## ✨ Elegant Architecture Highlights
 
@@ -12,7 +12,7 @@ A modern, elegant API service for managing application configurations using the 
 - 🎭 **Single Event Pattern** - Clean, scalable event handling
 - 🚀 **Zero Dependencies** - Pure vanilla JavaScript on frontend
 - 📦 **Minimal Code** - ~40 lines per component, maximum clarity
-
+- 📦 **Containers** - woop woop cool no mess.
 ## Features
 
 - ✅ Full CRUD operations for configurations
