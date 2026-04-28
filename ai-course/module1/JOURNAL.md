@@ -40,7 +40,6 @@ follow the instructions in 1-web-api-specs.md in prompts
 - Run `npm test` to execute test suite
 
 ### Notes:
-- Database column changed from `key` to `key_name` to avoid MySQL reserved word
 - All CRUD operations implemented and tested
 - Frontend provides full configuration management interface
 - **Project organized in ai-course/module1/ directory structure**

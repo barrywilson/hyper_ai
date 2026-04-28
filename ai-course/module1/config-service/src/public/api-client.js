@@ -13,7 +13,7 @@
  *   
  *   const configs = await api('list');
  *   const config = await api('get', { id: 1 });
- *   await api('create', { key_name: 'app', value: 'MyApp' });
+ *   await api('create', { key: 'app', value: 'MyApp' });
  *   await api('update', { id: 1, value: 'Updated' });
  *   await api('delete', { id: 1 });
  */

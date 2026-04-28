@@ -59,7 +59,7 @@ config-service/
 - JSON response bodies
 
 **Validation rules**:
-- `key_name`: required, string, max 255 chars, must be unique
+- `key`: required, string, max 255 chars, must be unique
 - `value`: optional, string, max 65535 chars (TEXT type)
 - `description`: optional, string
 
@@ -114,7 +114,7 @@ const configClient = new ConfigClient({
 **List all configs**:
 ```javascript
 const configs = await configClient.list();
-// → [{ id: 1, key_name: '...', ... }, ...]
+// → [{ id: 1, key: '...', ... }, ...]
 ```
 
 **Get single config**:
@@ -131,7 +131,7 @@ try {
 **Create config**:
 ```javascript
 const newConfig = await configClient.create({
-    key_name: 'app_name',
+    key: 'app_name',
     value: 'MyApp',
     description: 'Application name'  // optional
 });
@@ -247,8 +247,8 @@ try {
 
 **Input validation before database operations**:
 ```javascript
-if (!req.body.key_name || req.body.key_name.trim() === '') {
-  return res.status(400).json({ error: 'key_name is required' });
+if (!req.body.key || req.body.key.trim() === '') {
+  return res.status(400).json({ error: 'key is required' });
 }
 ```
 

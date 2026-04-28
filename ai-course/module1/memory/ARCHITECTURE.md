@@ -74,7 +74,7 @@ POST /api/resolve
 
 ### Create/Update Flow
 1. User submits form
-2. `app.js` calls `api('create', { key_name, value, description })`
+2. `app.js` calls `api('create', { key, value, description })`
 3. POSTs to `/api/resolve` with action and data
 4. Resolver routes to appropriate handler
 5. Backend validates input
@@ -105,7 +105,7 @@ const api = createApi({
 // Usage
 await api('list');                    // List all
 await api('get', { id: 1 });          // Get one
-await api('create', { key_name: ... }); // Create
+await api('create', { key: ... }); // Create
 await api('update', { id: 1, ... });  // Update
 await api('delete', { id: 1 });       // Delete
 ```
@@ -124,7 +124,7 @@ await api('delete', { id: 1 });       // Delete
 ```sql
 CREATE TABLE configurations (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  key_name VARCHAR(255) NOT NULL UNIQUE,
+  'key' VARCHAR(255) NOT NULL UNIQUE,
   value TEXT,
   description TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -133,7 +133,7 @@ CREATE TABLE configurations (
 ```
 
 **Notes:**
-- `key_name` used instead of `key` (MySQL reserved word)
+
 - `UNIQUE` constraint prevents duplicate keys
 - Timestamps auto-track creation/updates
 
@@ -151,7 +151,7 @@ CREATE TABLE configurations (
   "version": "v1",
   "action": "list|get|create|update|delete",
   "id": 1,                    // Optional: for get/update/delete
-  "key_name": "app_name",     // Optional: for create
+  "key": "app_name",     // Optional: for create
   "value": "MyApp",           // Optional: for create/update
   "description": "..."        // Optional: for create/update
 }
@@ -163,7 +163,7 @@ CREATE TABLE configurations (
 ```json
 {
   "id": 1,
-  "key_name": "app_name",
+  "key": "app_name",
   "value": "MyApp",
   "description": "Application name",
   "created_at": "2025-01-15T10:30:00Z",

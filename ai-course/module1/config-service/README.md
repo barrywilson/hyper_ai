@@ -210,7 +210,7 @@ const config = await configApi('get', { id: 1 });
 
 // Create configuration
 const newConfig = await configApi('create', {
-  key_name: 'app_name',
+  key: 'app_name',
   value: 'MyApp',
   description: 'Application name'
 });
@@ -389,7 +389,7 @@ config-service/
 ```sql
 CREATE TABLE configurations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    key_name VARCHAR(255) UNIQUE NOT NULL,
+    key VARCHAR(255) UNIQUE NOT NULL,
     value TEXT NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -66,7 +66,7 @@ All methods return Promises. Errors are standardized:
 ```javascript
 // Successful call
 const config = await client.get(1);
-// → { id: 1, key_name: '...', value: '...', ... }
+// → { id: 1, key: '...', value: '...', ... }
 
 // Error call
 try {
@@ -96,25 +96,25 @@ try {
 
 ```javascript
 const configs = await client.list();
-// → [{ id: 1, key_name: 'app_name', value: 'MyApp', ... }, ...]
+// → [{ id: 1, key: 'app_name', value: 'MyApp', ... }, ...]
 ```
 
 #### Get Single Configuration
 
 ```javascript
 const config = await client.get(1);
-// → { id: 1, key_name: 'app_name', value: 'MyApp', description: '...', created_at: '...', updated_at: '...' }
+// → { id: 1, key: 'app_name', value: 'MyApp', description: '...', created_at: '...', updated_at: '...' }
 ```
 
 #### Create Configuration
 
 ```javascript
 const newConfig = await client.create({
-  key_name: 'api_timeout',
+  key: 'api_timeout',
   value: '30000',
   description: 'Timeout in ms'
 });
-// → { id: 2, key_name: 'api_timeout', value: '30000', ... }
+// → { id: 2, key: 'api_timeout', value: '30000', ... }
 ```
 
 #### Update Configuration
@@ -124,7 +124,7 @@ const updated = await client.update(1, {
   value: 'UpdatedValue',
   description: 'New description'
 });
-// → { id: 1, key_name: 'app_name', value: 'UpdatedValue', ... }
+// → { id: 1, key: 'app_name', value: 'UpdatedValue', ... }
 ```
 
 #### Delete Configuration
@@ -180,7 +180,7 @@ try {
   const updated = await configClient.update(configs[0].id, {
     value: 'NewValue'
   });
-  console.log('Updated:', updated.key_name);
+  console.log('Updated:', updated.key);
 } catch (error) {
   console.error(`Error: ${error.message} (${error.status})`);
 }
@@ -244,7 +244,7 @@ const client = new ConfigClient();
 client.list().then(configs => console.log('✅ List:', configs.length));
 
 // Test create
-client.create({ key_name: 'test', value: 'value' })
+client.create({ key: 'test', value: 'value' })
   .then(config => console.log('✅ Create:', config.id))
   .catch(err => console.error('❌ Create failed:', err.message));
 

@@ -51,10 +51,10 @@ Build a lightweight, web-based API service for managing application configuratio
 
 ## Key Decisions Made
 
-1. **Column naming**: Used `key_name` instead of `key` to avoid MySQL reserved words
-2. **No ORM**: Direct SQL for clarity and control
-3. **Vanilla JS frontend**: No build step, direct browser execution
-4. **Simple architecture**: Monolithic structure, suitable for learning
+
+1. **No ORM**: Direct SQL for clarity and control
+2. **Vanilla JS frontend**: No build step, direct browser execution
+3. **Simple architecture**: Monolithic structure, suitable for learning
 
 ## Team & Collaboration
 

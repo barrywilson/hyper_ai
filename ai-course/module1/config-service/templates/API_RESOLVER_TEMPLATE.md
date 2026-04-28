@@ -146,7 +146,7 @@ const api = createApi({
 // Use actions
 await api('list');
 await api('get', { id: 1 });
-await api('create', { key_name: 'test', value: 'value' });
+await api('create', { key: 'test', value: 'value' });
 await api('update', { id: 1, value: 'new value' });
 await api('delete', { id: 1 });
 ```
