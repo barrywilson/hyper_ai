@@ -1,6 +1,6 @@
 # Configuration Service API
 
-A RESTful API service for managing application configurations with a web-based interface. Built with Node.js, Express, and MySQL.
+A modern API service for managing application configurations using the **API Resolver Pattern**. Built with Node.js, Express, and MySQL.
 
 ## Features
 
