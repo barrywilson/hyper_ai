@@ -1,23 +1,37 @@
 # Configuration Service API
 
-A modern API service for managing application configurations using the **API Resolver Pattern**. Built with Node.js, Express, and MySQL.
+A modern, elegant API service for managing application configurations using the **API Resolver Pattern**. Built with Node.js, Express, MySQL, and vanilla JavaScript custom elements.
+
+## ✨ Elegant Architecture Highlights
+
+- 🎯 **API Resolver Pattern** - Dynamic, scalable server-side routing
+- 🧩 **Custom Elements** - Reusable web components without frameworks
+- 🎨 **Slot-Like Behavior** - Flexible content injection without Shadow DOM
+- 🔄 **Conditional Rendering** - Single component, multiple modes
+- 📝 **Inline Scripts** - Simple pages, co-located logic
+- 🎭 **Single Event Pattern** - Clean, scalable event handling
+- 🚀 **Zero Dependencies** - Pure vanilla JavaScript on frontend
+- 📦 **Minimal Code** - ~40 lines per component, maximum clarity
 
 ## Features
 
 - ✅ Full CRUD operations for configurations
-- ✅ RESTful JSON API
-- ✅ Web-based user interface
+- ✅ API Resolver Pattern (dynamic namespace/version loading)
+- ✅ Web-based user interface with custom elements
+- ✅ Read-only and editable views (same components)
 - ✅ Direct SQL queries (no ORM)
 - ✅ Input validation and error handling
 - ✅ Comprehensive test suite with Jest
-- ✅ Docker-based MySQL database
+- ✅ Docker-based MySQL database (ephemeral for tests)
+- ✅ Reusable component templates and guidelines
 
 ## Tech Stack
 
 - **Backend**: Node.js, Express
-- **Frontend**: HTML, CSS, Vanilla JavaScript
+- **Frontend**: HTML, CSS, Vanilla JavaScript (Custom Elements)
 - **Database**: MySQL 8.0 (Docker)
 - **Testing**: Jest, Supertest
+- **Architecture**: API Resolver Pattern
 
 ## Prerequisites
 
@@ -97,6 +111,8 @@ npm run dev
 npm test
 ```
 
+Tests use the ephemeral database - no mocking needed!
+
 ### Run tests in watch mode
 
 ```bash
@@ -143,184 +159,225 @@ docker exec -it mysql_sample mysql -u my_user -p sample_db
 
 Enter the password when prompted (default: `my_password`).
 
-## Client Library
+## API Architecture: Resolver Pattern
 
-For applications consuming the Configuration Service, we recommend using the **Configuration Client Library** instead of making raw HTTP requests. This provides a clean abstraction layer with consistent error handling and protection from breaking API changes.
+### Why Resolver Pattern?
 
-### Quick Start
+Traditional REST APIs require server changes for every new endpoint. The resolver pattern uses **dynamic loading** - add new features without touching the server!
 
-**1. Load the library in your HTML:**
+### How It Works
 
-```html
-<script src="http://localhost:3000/config-client.js"></script>
+**Single Endpoint:**
+```
+POST /api/resolve
 ```
 
-**2. Initialize in your JavaScript:**
+**Request Structure:**
+```json
+{
+  "namespace": "ai.course.config",
+  "version": "v1",
+  "action": "list",
+  "params": {}
+}
+```
 
+**Server Dynamically Loads:**
 ```javascript
-const configClient = new ConfigClient({
-    baseUrl: 'http://localhost:3000/api/configs',
-    timeout: 10000
+// Server loads: ./resolvers/ai.course.config.v1.js
+const resolver = require(`./resolvers/${namespace}.${version}`);
+const result = await resolver.resolve({ action, params });
+```
+
+### Client Usage
+
+**Initialize API Client:**
+```javascript
+const configApi = createApi({
+  namespace: 'ai.course.config',
+  version: 'v1',
+  baseUrl: '/api'
 });
 ```
 
-**3. Use the API:**
-
+**Make Calls:**
 ```javascript
 // List all configurations
-const configs = await configClient.list();
+const configs = await configApi('list');
 
-// Get a single configuration
-const config = await configClient.get(1);
+// Get single configuration
+const config = await configApi('get', { id: 1 });
 
-// Create a new configuration
-const newConfig = await configClient.create({
-    key_name: 'app_name',
-    value: 'MyApp',
-    description: 'Application name'
+// Create configuration
+const newConfig = await configApi('create', {
+  key_name: 'app_name',
+  value: 'MyApp',
+  description: 'Application name'
 });
 
-// Update a configuration
-const updated = await configClient.update(1, {
-    value: 'UpdatedValue',
-    description: 'Updated description'
+// Update configuration
+const updated = await configApi('update', {
+  id: 1,
+  value: 'UpdatedValue',
+  description: 'Updated description'
 });
 
-// Delete a configuration
-await configClient.delete(1);
+// Delete configuration
+await configApi('delete', { id: 1 });
 ```
 
-### Error Handling
+### Benefits
 
-The client library throws `ConfigClientError` exceptions with structured information:
+✅ **Scalable** - Add new namespaces/versions without server changes
+✅ **Versioned** - Multiple API versions coexist
+✅ **Dynamic** - Resolvers loaded on-demand
+✅ **Testable** - Easy to test in isolation
+✅ **Maintainable** - Clear separation of concerns
+
+## Frontend Architecture: Custom Elements
+
+### Elegant Patterns
+
+#### 1. Slot-Like Behavior
+Reusable components with flexible content injection:
+
+```html
+<!-- Same component, different content -->
+<app-header>
+  <div slot="title">
+    <h1>Configuration Service</h1>
+    <p>View configurations</p>
+  </div>
+  <div slot="actions">
+    <a href="admin.html">⚙️ Admin Dashboard</a>
+  </div>
+</app-header>
+
+<app-header>
+  <div slot="title">
+    <h1>⚙️ Admin Dashboard</h1>
+    <p>Configuration Management</p>
+  </div>
+  <div slot="actions">
+    <a href="index.html">← Back to App</a>
+  </div>
+</app-header>
+```
+
+#### 2. Conditional Rendering
+Single component, multiple modes:
+
+```html
+<!-- Read-only view (index.html) -->
+<config-table id="config-table" readonly></config-table>
+
+<!-- Editable view (admin.html) -->
+<config-table id="config-table"></config-table>
+```
+
+#### 3. Inline Scripts
+Simple pages don't need separate files:
+
+```html
+<script>
+  // ~50 lines of simple logic inline
+  const configApi = createApi({
+    namespace: 'ai.course.config',
+    version: 'v1',
+    baseUrl: '/api'
+  });
+  
+  const configTable = document.getElementById('config-table');
+  
+  document.addEventListener('DOMContentLoaded', async () => {
+    const configurations = await configApi('list');
+    configTable.data = configurations;
+  });
+</script>
+```
+
+#### 4. Single Event Pattern
+One event, multiple actions:
 
 ```javascript
-try {
-    await configClient.get(999);
-} catch (error) {
-    console.error(`Error: ${error.message}`);        // 'Configuration not found'
-    console.error(`Status: ${error.status}`);         // 404
-    console.error(`URL: ${error.url}`);               // Request URL
-    console.error(`Response:`, error.response);       // Full response object
-}
+document.addEventListener('config-action', (e) => {
+  const { action, id } = e.detail;
+  if (action === 'edit') editConfiguration(id);
+  else if (action === 'delete') deleteConfiguration(id);
+});
 ```
 
-### Library Benefits
+### Custom Elements
 
-- **Breaking change protection**: Update API independently; clients unaffected
-- **Consistent errors**: All apps handle errors the same way
-- **Input validation**: Client validates before sending requests
-- **Type safety**: Parameter validation prevents common mistakes
-- **Future extensions**: Add caching, retries, metrics without changing consumers
+#### app-header.js (~40 lines)
+Reusable header with slot-like behavior. Used on both pages with different content.
 
-### Current Consumers
+#### app-message.js (~35 lines)
+Message display component with auto-hide for success messages.
 
-- **Admin Dashboard** (`/admin.html`) — Professional management interface
-- **Main App** (`/`) — Simple configuration manager
+#### app-loading.js (~25 lines)
+Simple loading indicator with show/hide methods.
 
-See [memory/CLIENT_LIBRARY.md](../memory/CLIENT_LIBRARY.md) for detailed documentation.
+#### config-table.js (~75 lines)
+Data table with conditional rendering for readonly mode.
 
-## API Endpoints (Direct HTTP)
-```
-
-**Response**: `200 OK`
-
-```json
-[
-  {
-    "id": 1,
-    "key": "app_name",
-    "value": "Config Service",
-    "description": "Application name",
-    "created_at": "2026-04-28T07:00:00.000Z",
-    "updated_at": "2026-04-28T07:00:00.000Z"
-  }
-]
-```
-
-### Get single configuration
-
-```http
-GET /api/config/:id
-```
-
-**Response**: `200 OK` or `404 Not Found`
-
-```json
-{
-  "id": 1,
-  "key": "app_name",
-  "value": "Config Service",
-  "description": "Application name",
-  "created_at": "2026-04-28T07:00:00.000Z",
-  "updated_at": "2026-04-28T07:00:00.000Z"
-}
-```
-
-### Create configuration
-
-```http
-POST /api/config
-Content-Type: application/json
-
-{
-  "key": "new_config",
-  "value": "config_value",
-  "description": "Optional description"
-}
-```
-
-**Response**: `201 Created` or `400 Bad Request`
-
-### Update configuration
-
-```http
-PUT /api/config/:id
-Content-Type: application/json
-
-{
-  "key": "updated_config",
-  "value": "updated_value",
-  "description": "Updated description"
-}
-```
-
-**Response**: `200 OK`, `400 Bad Request`, or `404 Not Found`
-
-### Delete configuration
-
-```http
-DELETE /api/config/:id
-```
-
-**Response**: `204 No Content` or `404 Not Found`
+**Features:**
+- Single component for both views
+- Attribute-based configuration (`readonly`)
+- Conditional event listeners
+- Used on index.html (readonly) and admin.html (editable)
 
 ## Web Interface
 
-Access the web interface at `http://localhost:3000`
+### Main Page (index.html)
+**Read-only view** - Simple configuration viewer
 
-The interface provides:
-- Form to add new configurations
-- Table displaying all configurations
-- Edit and delete buttons for each configuration
-- Real-time feedback with success/error messages
+- View all configurations in a table
+- No edit/delete buttons (readonly mode)
+- Link to admin dashboard
+- Inline script (~50 lines)
+
+Access at: `http://localhost:3000`
+
+### Admin Dashboard (admin.html)
+**Full management interface** - Complete CRUD operations
+
+- View all configurations
+- Search/filter functionality
+- Add new configurations (modal dialog)
+- Edit existing configurations
+- Delete configurations
+- Statistics dashboard
+- Inline script (~150 lines)
+
+Access at: `http://localhost:3000/admin.html`
 
 ## Project Structure
 
 ```
 config-service/
 ├── src/
-│   ├── server.js              # Express server setup
+│   ├── server.js              # Express server with resolver endpoint
 │   ├── db.js                  # Database connection pool
-│   ├── routes/
-│   │   └── config.js          # Configuration API routes
+│   ├── resolvers/             # API resolvers (dynamically loaded)
+│   │   └── ai.course.config.v1.js  # Configuration CRUD (~150 lines)
 │   └── public/
-│       ├── index.html         # Frontend HTML
-│       ├── style.css          # Frontend styles
-│       └── app.js             # Frontend JavaScript
+│       ├── elements/          # Custom elements
+│       │   ├── app-header.js  # Reusable header (~40 lines)
+│       │   ├── app-message.js # Message display (~35 lines)
+│       │   ├── app-loading.js # Loading indicator (~25 lines)
+│       │   └── config-table.js # Data table (~75 lines)
+│       ├── api-client.js      # Universal API client (~55 lines)
+│       ├── index.html         # Main page (with inline script)
+│       ├── admin.html         # Admin page (with inline script)
+│       └── style.css          # Unified styles
+├── templates/                 # Reusable templates & guidelines
+│   ├── CUSTOM_ELEMENT_TEMPLATE.md
+│   ├── API_RESOLVER_TEMPLATE.md
+│   ├── CODING_GUIDELINES.md
+│   └── README.md
 ├── tests/
-│   └── config.test.js         # Jest API tests
-├── migrations.sql             # Database schema
+│   └── config.test.js         # Jest API tests (resolver pattern)
 ├── package.json               # Dependencies and scripts
 ├── .env                       # Environment variables
 ├── .gitignore                 # Git ignore rules
@@ -332,7 +389,7 @@ config-service/
 ```sql
 CREATE TABLE configurations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    `key` VARCHAR(255) UNIQUE NOT NULL,
+    key_name VARCHAR(255) UNIQUE NOT NULL,
     value TEXT NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -344,34 +401,65 @@ CREATE TABLE configurations (
 
 The API returns appropriate HTTP status codes:
 
-- `200 OK` - Successful GET/PUT request
-- `201 Created` - Successful POST request
-- `204 No Content` - Successful DELETE request
+- `200 OK` - Successful request
 - `400 Bad Request` - Validation error or duplicate key
-- `404 Not Found` - Resource not found
+- `404 Not Found` - Resource not found or invalid namespace/version
 - `500 Internal Server Error` - Server error
 
 Error responses include a JSON object with an error message:
 
 ```json
 {
-  "error": "Configuration key already exists"
+  "error": "Configuration with key 'app_name' already exists"
 }
 ```
 
 ## Testing
 
 The test suite includes:
-- API endpoint tests (GET, POST, PUT, DELETE)
+- Resolver pattern API tests (list, create, get, update, delete)
 - Input validation tests
 - Error handling tests
 - Duplicate key prevention tests
+- Invalid namespace/version/action tests
+
+**No mocking needed** - tests use the ephemeral database!
 
 Run tests with:
 
 ```bash
 npm test
 ```
+
+## Templates & Guidelines
+
+The `templates/` directory contains comprehensive documentation:
+
+### [CUSTOM_ELEMENT_TEMPLATE.md](./templates/CUSTOM_ELEMENT_TEMPLATE.md)
+- Basic custom element pattern
+- Slot-like behavior pattern
+- Conditional rendering pattern
+- Page organization guidelines
+- Real examples from the project
+
+### [API_RESOLVER_TEMPLATE.md](./templates/API_RESOLVER_TEMPLATE.md)
+- Resolver pattern template
+- CRUD operations
+- Validation and error handling
+- Database integration
+
+### [CODING_GUIDELINES.md](./templates/CODING_GUIDELINES.md)
+- Code style and patterns
+- Architecture principles
+- File organization
+- Security best practices
+- Elegant code examples
+
+### [templates/README.md](./templates/README.md)
+- Quick start guides
+- Architecture overview
+- Benefits and philosophy
+- Version history
 
 ## Security Considerations
 
@@ -380,15 +468,29 @@ npm test
 - CORS enabled for cross-origin requests
 - Environment variables for sensitive data
 - XSS prevention with HTML escaping in frontend
+- No inline event handlers (uses data attributes)
+
+## Key Principles
+
+1. **Simplicity** - Minimal code, maximum clarity
+2. **Reusability** - One component, multiple uses
+3. **Flexibility** - Slots for content injection
+4. **Modularity** - Conditional rendering for modes
+5. **Pragmatism** - Inline scripts when appropriate
+6. **Elegance** - Clean, readable, maintainable
+7. **Scalability** - Resolver pattern for growth
+8. **Testability** - Easy to test without mocks
 
 ## Future Enhancements
 
 - [ ] Authentication and authorization
 - [ ] Configuration versioning/history
 - [ ] Bulk import/export functionality
-- [ ] Search and filter capabilities
+- [ ] Search and filter capabilities (partially implemented)
 - [ ] API rate limiting
 - [ ] Pagination for large datasets
+- [ ] Additional resolvers for other resources
+- [ ] WebSocket support for real-time updates
 
 ## License
 
@@ -398,10 +500,17 @@ ISC
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Write/update tests
-5. Submit a pull request
+3. Follow the coding guidelines in `templates/`
+4. Use the templates for new components/resolvers
+5. Write/update tests
+6. Submit a pull request
+
+**Remember:** The best code is no code. The second best is simple, elegant code.
 
 ## Support
 
 For issues or questions, please open an issue in the repository.
+
+---
+
+**Look at the elegance of this code and follow these patterns!**

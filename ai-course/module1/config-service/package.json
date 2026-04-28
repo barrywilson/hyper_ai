@@ -6,24 +6,32 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest tests/config.integration.test.js",   
+    "test:unit": "jest tests/config.test.js"
   },
-  "keywords": ["config", "api", "mysql", "rest"],
+  "keywords": [
+    "config",
+    "api",
+    "mysql",
+    "rest"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "mysql2": "^3.6.5",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "cors": "^2.8.5"
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5"
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "node-fetch": "^2.7.0",
     "supertest": "^6.3.3"
   },
   "jest": {
     "testEnvironment": "node",
-    "coveragePathIgnorePatterns": ["/node_modules/"]
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }

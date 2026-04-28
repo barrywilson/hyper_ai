@@ -148,7 +148,13 @@
             try {
                 allConfigs = await api('list');
                 configTable.data = allConfigs;
-                updateStats();
+                document.getElementById('totalConfigs').textContent = allConfigs.length;
+            
+                if (allConfigs.length > 0) {
+                    const latest = new Date(allConfigs[0].updated_at);
+                    document.getElementById('lastUpdated').textContent = latest.toLocaleDateString();
+                }
+                
             } catch (error) {
                 message.show('Error loading configurations: ' + error.message, 'error');
             } finally {
@@ -242,14 +248,7 @@
             }
         }
 
-        function updateStats() {
-            document.getElementById('totalConfigs').textContent = allConfigs.length;
-            
-            if (allConfigs.length > 0) {
-                const latest = new Date(allConfigs[0].updated_at);
-                document.getElementById('lastUpdated').textContent = latest.toLocaleDateString();
-            }
-        }
+      
 
       
         

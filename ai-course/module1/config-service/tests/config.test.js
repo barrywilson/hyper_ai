@@ -5,17 +5,28 @@ const pool = require('../src/db');
 // Test configuration
 let testConfigId;
 
-describe('Configuration API Tests', () => {
+// Helper function to call resolver API
+const callResolver = (action, params = {}) => {
+  return request(app)
+    .post('/api/resolve')
+    .send({
+      namespace: 'ai.course.config',
+      version: 'v1',
+      action,
+      params
+    });
+};
+
+describe('Configuration API Tests (Resolver Pattern)', () => {
   
   // Clean up after all tests
   afterAll(async () => {
     await pool.end();
   });
 
-  describe('GET /api/config', () => {
+  describe('list action', () => {
     test('should return array of configurations', async () => {
-      const response = await request(app)
-        .get('/api/config')
+      const response = await callResolver('list')
         .expect('Content-Type', /json/)
         .expect(200);
 
@@ -23,22 +34,20 @@ describe('Configuration API Tests', () => {
     });
   });
 
-  describe('POST /api/config', () => {
+  describe('create action', () => {
     test('should create a new configuration', async () => {
       const newConfig = {
-        key: 'test_key_' + Date.now(),
+        key_name: 'test_key_' + Date.now(),
         value: 'test_value',
         description: 'Test description'
       };
 
-      const response = await request(app)
-        .post('/api/config')
-        .send(newConfig)
+      const response = await callResolver('create', newConfig)
         .expect('Content-Type', /json/)
-        .expect(201);
+        .expect(200);
 
       expect(response.body).toHaveProperty('id');
-      expect(response.body.key).toBe(newConfig.key);
+      expect(response.body.key_name).toBe(newConfig.key_name);
       expect(response.body.value).toBe(newConfig.value);
       
       testConfigId = response.body.id;
@@ -46,12 +55,10 @@ describe('Configuration API Tests', () => {
 
     test('should validate required fields', async () => {
       const invalidConfig = {
-        description: 'Missing key and value'
+        description: 'Missing key_name and value'
       };
 
-      const response = await request(app)
-        .post('/api/config')
-        .send(invalidConfig)
+      const response = await callResolver('create', invalidConfig)
         .expect('Content-Type', /json/)
         .expect(400);
 
@@ -60,53 +67,45 @@ describe('Configuration API Tests', () => {
 
     test('should prevent duplicate keys', async () => {
       const config1 = {
-        key: 'duplicate_test_' + Date.now(),
+        key_name: 'duplicate_test_' + Date.now(),
         value: 'value1'
       };
 
       // Create first config
-      await request(app)
-        .post('/api/config')
-        .send(config1)
-        .expect(201);
+      await callResolver('create', config1)
+        .expect(200);
 
       // Try to create duplicate
-      const response = await request(app)
-        .post('/api/config')
-        .send(config1)
+      const response = await callResolver('create', config1)
         .expect(400);
 
       expect(response.body.error).toContain('already exists');
     });
   });
 
-  describe('GET /api/config/:id', () => {
+  describe('get action', () => {
     test('should return a single configuration', async () => {
       if (!testConfigId) {
         // Create a test config if none exists
         const newConfig = {
-          key: 'test_single_' + Date.now(),
+          key_name: 'test_single_' + Date.now(),
           value: 'test_value'
         };
-        const createResponse = await request(app)
-          .post('/api/config')
-          .send(newConfig);
+        const createResponse = await callResolver('create', newConfig);
         testConfigId = createResponse.body.id;
       }
 
-      const response = await request(app)
-        .get(`/api/config/${testConfigId}`)
+      const response = await callResolver('get', { id: testConfigId })
         .expect('Content-Type', /json/)
         .expect(200);
 
       expect(response.body).toHaveProperty('id', testConfigId);
-      expect(response.body).toHaveProperty('key');
+      expect(response.body).toHaveProperty('key_name');
       expect(response.body).toHaveProperty('value');
     });
 
     test('should return 404 for non-existent configuration', async () => {
-      const response = await request(app)
-        .get('/api/config/999999')
+      const response = await callResolver('get', { id: 999999 })
         .expect('Content-Type', /json/)
         .expect(404);
 
@@ -114,28 +113,24 @@ describe('Configuration API Tests', () => {
     });
   });
 
-  describe('PUT /api/config/:id', () => {
+  describe('update action', () => {
     test('should update an existing configuration', async () => {
       if (!testConfigId) {
         const newConfig = {
-          key: 'test_update_' + Date.now(),
+          key_name: 'test_update_' + Date.now(),
           value: 'original_value'
         };
-        const createResponse = await request(app)
-          .post('/api/config')
-          .send(newConfig);
+        const createResponse = await callResolver('create', newConfig);
         testConfigId = createResponse.body.id;
       }
 
       const updatedConfig = {
-        key: 'updated_key_' + Date.now(),
+        id: testConfigId,
         value: 'updated_value',
         description: 'Updated description'
       };
 
-      const response = await request(app)
-        .put(`/api/config/${testConfigId}`)
-        .send(updatedConfig)
+      const response = await callResolver('update', updatedConfig)
         .expect('Content-Type', /json/)
         .expect(200);
 
@@ -145,13 +140,11 @@ describe('Configuration API Tests', () => {
 
     test('should return 404 for non-existent configuration', async () => {
       const updatedConfig = {
-        key: 'test_key',
+        id: 999999,
         value: 'test_value'
       };
 
-      const response = await request(app)
-        .put('/api/config/999999')
-        .send(updatedConfig)
+      const response = await callResolver('update', updatedConfig)
         .expect('Content-Type', /json/)
         .expect(404);
 
@@ -161,22 +154,19 @@ describe('Configuration API Tests', () => {
     test('should validate required fields on update', async () => {
       if (!testConfigId) {
         const newConfig = {
-          key: 'test_validate_' + Date.now(),
+          key_name: 'test_validate_' + Date.now(),
           value: 'test_value'
         };
-        const createResponse = await request(app)
-          .post('/api/config')
-          .send(newConfig);
+        const createResponse = await callResolver('create', newConfig);
         testConfigId = createResponse.body.id;
       }
 
       const invalidUpdate = {
-        description: 'Missing key and value'
+        id: testConfigId,
+        description: 'Missing value'
       };
 
-      const response = await request(app)
-        .put(`/api/config/${testConfigId}`)
-        .send(invalidUpdate)
+      const response = await callResolver('update', invalidUpdate)
         .expect('Content-Type', /json/)
         .expect(400);
 
@@ -184,32 +174,74 @@ describe('Configuration API Tests', () => {
     });
   });
 
-  describe('DELETE /api/config/:id', () => {
+  describe('delete action', () => {
     test('should delete an existing configuration', async () => {
       // Create a config to delete
       const newConfig = {
-        key: 'test_delete_' + Date.now(),
+        key_name: 'test_delete_' + Date.now(),
         value: 'to_be_deleted'
       };
-      const createResponse = await request(app)
-        .post('/api/config')
-        .send(newConfig);
+      const createResponse = await callResolver('create', newConfig);
       const deleteId = createResponse.body.id;
 
       // Delete it
-      await request(app)
-        .delete(`/api/config/${deleteId}`)
-        .expect(204);
+      await callResolver('delete', { id: deleteId })
+        .expect(200);
 
       // Verify it's gone
-      await request(app)
-        .get(`/api/config/${deleteId}`)
+      await callResolver('get', { id: deleteId })
         .expect(404);
     });
 
     test('should return 404 for non-existent configuration', async () => {
+      const response = await callResolver('delete', { id: 999999 })
+        .expect('Content-Type', /json/)
+        .expect(404);
+
+      expect(response.body).toHaveProperty('error');
+    });
+  });
+
+  describe('resolver pattern validation', () => {
+    test('should return 400 for invalid action', async () => {
       const response = await request(app)
-        .delete('/api/config/999999')
+        .post('/api/resolve')
+        .send({
+          namespace: 'ai.course.config',
+          version: 'v1',
+          action: 'invalid_action',
+          params: {}
+        })
+        .expect('Content-Type', /json/)
+        .expect(400);
+
+      expect(response.body).toHaveProperty('error');
+    });
+
+    test('should return 404 for invalid namespace', async () => {
+      const response = await request(app)
+        .post('/api/resolve')
+        .send({
+          namespace: 'invalid.namespace',
+          version: 'v1',
+          action: 'list',
+          params: {}
+        })
+        .expect('Content-Type', /json/)
+        .expect(404);
+
+      expect(response.body).toHaveProperty('error');
+    });
+
+    test('should return 404 for invalid version', async () => {
+      const response = await request(app)
+        .post('/api/resolve')
+        .send({
+          namespace: 'ai.course.config',
+          version: 'v999',
+          action: 'list',
+          params: {}
+        })
         .expect('Content-Type', /json/)
         .expect(404);
 
