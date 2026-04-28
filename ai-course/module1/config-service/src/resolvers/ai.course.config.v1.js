@@ -5,7 +5,7 @@
 
 const pool = require('../db');
 
-async function resolve(action, params) {
+async function resolve({action, params,mappings}) {
   switch (action) {
     case 'list':
       const [rows] = await pool.query('SELECT * FROM configurations ORDER BY id');

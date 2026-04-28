@@ -21,12 +21,13 @@
 function createApi({ namespace, version = 'v1', baseUrl = '/api' }) {
   const resolverUrl = `${baseUrl}/resolve`;
 
-  return async function api(action, params = {}) {
+  return async function api(action, params = undefined,mappings=undefined) {
     const payload = {
       namespace,
       version,
       action,
-      ...params
+      params,
+      mappings
     };
 
     const response = await fetch(resolverUrl, {

@@ -16,8 +16,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // API Resolver - Universal endpoint for all API requests
 app.post('/api/resolve', async (req, res) => {
-  const { namespace, version, action, ...params } = req.body;
-  
+  const { namespace, version, action, params,mappings } = req.body;
+  console.log({ namespace, version, action, params,mappings } )
   // Validate required fields
   if (!namespace || !version || !action) {
     return res.status(400).json({ 
@@ -31,7 +31,7 @@ app.post('/api/resolve', async (req, res) => {
     const resolver = require(resolverPath);
     
     // Execute the resolver
-    const result = await resolver.resolve(action, params);
+    const result = await resolver.resolve({action, params,mappings});
     
     // Handle the result
     if (result.error) {

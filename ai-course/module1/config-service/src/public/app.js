@@ -79,7 +79,7 @@ function renderConfigurations(configurations) {
     configTbody.innerHTML = configurations.map(config => `
         <tr>
             <td>${config.id}</td>
-            <td><strong>${escapeHtml(config.key_name)}</strong></td>
+            <td><strong>${escapeHtml(config.key)}</strong></td>
             <td>${escapeHtml(config.value)}</td>
             <td>${config.description ? escapeHtml(config.description) : '-'}</td>
             <td>${formatDate(config.created_at)}</td>
