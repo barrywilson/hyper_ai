@@ -6,6 +6,7 @@ const pool = require('../db');
 router.get('/', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM configurations ORDER BY id');
+    console.log(rows)
     res.json(rows);
   } catch (error) {
     console.error('Error fetching configurations:', error);
