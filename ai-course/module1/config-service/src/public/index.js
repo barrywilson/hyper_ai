@@ -22,7 +22,7 @@ const submitBtn = document.getElementById('submit-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 const formTitle = document.getElementById('form-title');
 const message = document.getElementById('message');
-const loadingDiv = document.getElementById('loading');
+const loading = document.getElementById('loading');
 
 // State
 let isEditing = false;
@@ -57,7 +57,7 @@ function setupEventListeners() {
  */
 async function loadConfigurations() {
     try {
-        loadingDiv.show();
+        loading.show();
         message.hide();
         
         const configurations = await configApi('list');
@@ -70,7 +70,7 @@ async function loadConfigurations() {
         console.error('Error loading configurations:', error);
         message.show('Failed to load configurations: ' + error.message, 'error');
     } finally {
-        loadingDiv.hide();
+        loading.hide();
     }
 }
 
