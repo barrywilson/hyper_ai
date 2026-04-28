@@ -57,11 +57,11 @@ function setupEventListeners() {
  */
 async function loadConfigurations() {
     try {
-        showLoading(true);
+        loadingDiv.show();
         message.hide();
         
         const configurations = await configApi('list');
-        console.log('Loaded configurations:', configurations);
+        
         if (configTable) {
             configTable.data = configurations;
         }
@@ -70,7 +70,7 @@ async function loadConfigurations() {
         console.error('Error loading configurations:', error);
         message.show('Failed to load configurations: ' + error.message, 'error');
     } finally {
-        showLoading(false);
+        loadingDiv.hide();
     }
 }
 
@@ -173,12 +173,5 @@ function resetForm() {
     submitBtn.textContent = 'Add Configuration';
     cancelBtn.style.display = 'none';
     message.hide();
-}
-
-/**
- * Show/hide loading indicator
- */
-function showLoading(show) {
-    loadingDiv.style.display = show ? 'block' : 'none';
 }
 

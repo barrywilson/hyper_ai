@@ -42,12 +42,10 @@
             </div>
 
             <!-- Message Display -->
-            <div id="message" class="message"></div>
+            <app-message id="message"></app-message>
 
             <!-- Loading State -->
-            <div id="loading" class="loading" style="display: none;">
-                Loading configurations...
-            </div>
+            <app-loading id="loading"></app-loading>
 
             <!-- Configurations Table -->
             <div class="table-wrapper">
@@ -93,6 +91,8 @@
     </div>
 
     <script src="api-client.js"></script>
+    <script src="elements/app-message.js"></script>
+    <script src="elements/app-loading.js"></script>
     <script src="elements/config-table.js"></script>
     <script>
         // Initialize API with resolver pattern
@@ -108,8 +108,8 @@
         const configModal = document.getElementById('configModal');
         const configForm = document.getElementById('configForm');
         const configTable = document.getElementById('config-table');
-        const messageEl = document.getElementById('message');
-        const loadingEl = document.getElementById('loading');
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
         const searchInput = document.getElementById('searchInput');
         const addConfigBtn = document.getElementById('addConfigBtn');
         const closeModalBtn = document.getElementById('closeModal');
@@ -145,17 +145,17 @@
         }
 
         async function loadConfigs() {
-            loadingEl.style.display = 'block';
-            messageEl.style.display = 'none';
+            loading.show();
+            message.hide();
             
             try {
                 allConfigs = await api('list');
                 configTable.data = allConfigs;
                 updateStats();
             } catch (error) {
-                showMessage('Error loading configurations: ' + error.message, 'error');
+                message.show('Error loading configurations: ' + error.message, 'error');
             } finally {
-                loadingEl.style.display = 'none';
+                loading.hide();
             }
         }
 
@@ -205,7 +205,7 @@
             const description = document.getElementById('description').value.trim();
             
             if (!key || !value) {
-                showMessage('Key name and value are required', 'error');
+                message.show('Key name and value are required', 'error');
                 return;
             }
             
@@ -216,20 +216,20 @@
                         value,
                         description: description || null
                     });
-                    showMessage('Configuration updated successfully!', 'success');
+                    message.show('Configuration updated successfully!', 'success');
                 } else {
                     await api('create', {
                         key_name: key,
                         value,
                         description: description || null
                     });
-                    showMessage('Configuration created successfully!', 'success');
+                    message.show('Configuration created successfully!', 'success');
                 }
                 
                 closeModal();
                 loadConfigs();
             } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
+                message.show('Error: ' + error.message, 'error');
             }
         }
 
@@ -238,10 +238,10 @@
             
             try {
                 await api('delete', { id: parseInt(id) });
-                showMessage('Configuration deleted successfully!', 'success');
+                message.show('Configuration deleted successfully!', 'success');
                 loadConfigs();
             } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
+                message.show('Error: ' + error.message, 'error');
             }
         }
 
@@ -254,15 +254,7 @@
             }
         }
 
-        function showMessage(text, type) {
-            messageEl.textContent = text;
-            messageEl.className = `message ${type}`;
-            messageEl.style.display = 'block';
-            
-            if (type === 'success') {
-                setTimeout(() => messageEl.style.display = 'none', 4000);
-            }
-        }
+      
         
     </script>
 </body>
