@@ -11,6 +11,7 @@ const escapeHtml = (text) => {
 
 
 const renderTable = (element, configurations) => {  
+  const isReadonly = element.hasAttribute('readonly');
   
   const rows = configurations.map(config => `
     <tr>
@@ -19,12 +20,14 @@ const renderTable = (element, configurations) => {
       <td>${escapeHtml(config.value)}</td>
       <td>${config.description ? escapeHtml(config.description) : '-'}</td>
       <td>${new Date(config.created_at).toLocaleDateString()}</td>
+      ${!isReadonly ? `
       <td>
         <div class="actions">
           <button class="btn btn-edit" data-action="edit" data-id="${config.id}">Edit</button>
           <button class="btn btn-danger" data-action="delete" data-id="${config.id}">Delete</button>
         </div>
       </td>
+      ` : ''}
     </tr>
   `).join('');
   
@@ -37,25 +40,27 @@ const renderTable = (element, configurations) => {
           <th>Value</th>
           <th>Description</th>
           <th>Created</th>
-          <th>Actions</th>
+          ${!isReadonly ? '<th>Actions</th>' : ''}
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
   `;
   
-  // Single event listener for all buttons
-  element.querySelectorAll('button[data-action]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      element.dispatchEvent(new CustomEvent('config-action', { 
-        detail: { 
-          action: e.target.dataset.action,
-          id: parseInt(e.target.dataset.id)
-        },
-        bubbles: true 
-      }));
+  // Single event listener for all buttons (only if not readonly)
+  if (!isReadonly) {
+    element.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        element.dispatchEvent(new CustomEvent('config-action', { 
+          detail: { 
+            action: e.target.dataset.action,
+            id: parseInt(e.target.dataset.id)
+          },
+          bubbles: true 
+        }));
+      });
     });
-  });
+  }
 };
 
 

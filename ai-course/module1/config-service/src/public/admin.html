@@ -219,7 +219,7 @@
                     message.show('Configuration updated successfully!', 'success');
                 } else {
                     await api('create', {
-                        key_name: key,
+                        key,
                         value,
                         description: description || null
                     });

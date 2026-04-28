@@ -19,42 +19,14 @@
         </header>
 
         <main>
-            <!-- Configuration Form -->
-            <section class="form-section">
-                <h2 id="form-title">Add New Configuration</h2>
-                <form id="config-form">
-                    <input type="hidden" id="config-id">
-                    
-                    <div class="form-group">
-                        <label for="config-key">Key *</label>
-                        <input type="text" id="config-key" required placeholder="e.g., app_name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="config-value">Value *</label>
-                        <textarea id="config-value" required placeholder="Configuration value"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="config-description">Description</label>
-                        <input type="text" id="config-description" placeholder="Optional description">
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" id="submit-btn">Add Configuration</button>
-                        <button type="button" class="btn btn-secondary" id="cancel-btn" style="display: none;">Cancel</button>
-                    </div>
-                </form>
-            </section>
-
             <!-- Configurations Table -->
             <section class="table-section">
-                <h2>Configurations</h2>
+                <h2>Configurations (Read-Only)</h2>
                 <app-message id="message"></app-message>
                 <app-loading id="loading"></app-loading>
                 
                 <div class="table-wrapper">
-                    <config-table id="config-table"></config-table>
+                    <config-table id="config-table" readonly></config-table>
                 </div>
             </section>
         </main>

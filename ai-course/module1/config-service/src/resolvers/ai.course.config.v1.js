@@ -21,12 +21,13 @@ async function resolve(pool,{action, params,mappings}) {
       return { status: 200, data: getRows[0] };
       
     case 'create':
-      if (!params.key_name || !params.value) {
-        return { status: 400, error: 'key_name and value are required' };
+      console.log({params})
+      if (!params.key || !params.value) {
+        return { status: 400, error: 'key and value are required' };
       }
       const [createResult] = await pool.query(
-        'INSERT INTO configurations (key_name, value, description) VALUES (?, ?, ?)',
-        [params.key_name, params.value, params.description || null]
+        'INSERT INTO configurations (`key`, value, description) VALUES (?, ?, ?)',
+        [params.key, params.value, params.description || null]
       );
       const [createdRows] = await pool.query('SELECT * FROM configurations WHERE id = ?', [createResult.insertId]);
       return { status: 201, data: createdRows[0] };
