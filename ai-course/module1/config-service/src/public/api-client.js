@@ -21,19 +21,18 @@
 function createApi({ namespace, version = 'v1', baseUrl = '/api' }) {
   const resolverUrl = `${baseUrl}/resolve`;
 
-  return async function api(action, params = undefined,mappings=undefined) {
-    const payload = {
-      namespace,
-      version,
-      action,
-      params,
-      mappings
-    };
+  return async function api(action, params = undefined,mappings=undefined) {   
 
     const response = await fetch(resolverUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        namespace,
+        version,
+        action,
+        params,
+        mappings
+        })
     });
 
     if (!response.ok) {
