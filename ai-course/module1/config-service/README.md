@@ -143,12 +143,84 @@ docker exec -it mysql_sample mysql -u my_user -p sample_db
 
 Enter the password when prompted (default: `my_password`).
 
-## API Endpoints
+## Client Library
 
-### Get all configurations
+For applications consuming the Configuration Service, we recommend using the **Configuration Client Library** instead of making raw HTTP requests. This provides a clean abstraction layer with consistent error handling and protection from breaking API changes.
 
-```http
-GET /api/config
+### Quick Start
+
+**1. Load the library in your HTML:**
+
+```html
+<script src="http://localhost:3000/config-client.js"></script>
+```
+
+**2. Initialize in your JavaScript:**
+
+```javascript
+const configClient = new ConfigClient({
+    baseUrl: 'http://localhost:3000/api/configs',
+    timeout: 10000
+});
+```
+
+**3. Use the API:**
+
+```javascript
+// List all configurations
+const configs = await configClient.list();
+
+// Get a single configuration
+const config = await configClient.get(1);
+
+// Create a new configuration
+const newConfig = await configClient.create({
+    key_name: 'app_name',
+    value: 'MyApp',
+    description: 'Application name'
+});
+
+// Update a configuration
+const updated = await configClient.update(1, {
+    value: 'UpdatedValue',
+    description: 'Updated description'
+});
+
+// Delete a configuration
+await configClient.delete(1);
+```
+
+### Error Handling
+
+The client library throws `ConfigClientError` exceptions with structured information:
+
+```javascript
+try {
+    await configClient.get(999);
+} catch (error) {
+    console.error(`Error: ${error.message}`);        // 'Configuration not found'
+    console.error(`Status: ${error.status}`);         // 404
+    console.error(`URL: ${error.url}`);               // Request URL
+    console.error(`Response:`, error.response);       // Full response object
+}
+```
+
+### Library Benefits
+
+- **Breaking change protection**: Update API independently; clients unaffected
+- **Consistent errors**: All apps handle errors the same way
+- **Input validation**: Client validates before sending requests
+- **Type safety**: Parameter validation prevents common mistakes
+- **Future extensions**: Add caching, retries, metrics without changing consumers
+
+### Current Consumers
+
+- **Admin Dashboard** (`/admin.html`) — Professional management interface
+- **Main App** (`/`) — Simple configuration manager
+
+See [memory/CLIENT_LIBRARY.md](../memory/CLIENT_LIBRARY.md) for detailed documentation.
+
+## API Endpoints (Direct HTTP)
 ```
 
 **Response**: `200 OK`

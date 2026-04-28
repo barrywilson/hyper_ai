@@ -68,26 +68,113 @@ config-service/
 - 404: Config not found
 - 500: Database/server error
 
-### src/public/app.js
+### src/public/config-client.js
 
-**Purpose**: Frontend logic for config management UI
+**Purpose**: Client library providing clean abstractions for API consumption
 
-**Key functions**:
-- `loadConfigs()` — Fetch and display all configs
-- `addConfig()` — Handle form submission for new configs
-- `updateConfig()` — Update existing config
-- `deleteConfig()` — Delete config with confirmation
+**Key elements**:
+- UMD pattern for universal module support (works in browsers and Node.js)
+- `ConfigClient` class with methods for CRUD operations
+- Custom `ConfigClientError` for consistent error handling
+- Request timeout enforcement via `AbortController`
+- Input validation before API calls
+- Parameterized safety (no string concatenation)
 
-**UI Patterns**:
-- Table display of configs
-- Form below table for new entries
-- Inline edit buttons per row
-- Confirmation dialogs for destructive actions
-- Success/error messages via alerts (can improve)
+**Methods**:
+- `list()` — Get all configurations
+- `get(id)` — Get single configuration
+- `getByKey(keyName)` — Convenience method by key name
+- `create(data)` — Create new configuration
+- `update(id, data)` — Update existing configuration
+- `delete(id)` — Delete configuration
 
-**Fetch pattern**: Use `fetch()` API with proper headers and error handling
+**Error handling**: Throws `ConfigClientError` with structured properties: `message`, `status`, `response`, `url`, `timestamp`
 
-### src/public/index.html
+**Usage**: See "Client Library Consumption" section below
+
+## Client Library Consumption
+
+All frontend code should use the ConfigClient library instead of raw `fetch()` calls.
+
+### Initialization
+
+```javascript
+// Load library first (in HTML)
+<script src="config-client.js"></script>
+
+// Initialize in your app
+const configClient = new ConfigClient({
+    baseUrl: '/api/configs',    // optional, default shown
+    timeout: 10000              // optional, default: 5000
+});
+```
+
+### Usage Patterns
+
+**List all configs**:
+```javascript
+const configs = await configClient.list();
+// → [{ id: 1, key_name: '...', ... }, ...]
+```
+
+**Get single config**:
+```javascript
+try {
+    const config = await configClient.get(1);
+} catch (error) {
+    if (error.status === 404) {
+        // Handle not found
+    }
+}
+```
+
+**Create config**:
+```javascript
+const newConfig = await configClient.create({
+    key_name: 'app_name',
+    value: 'MyApp',
+    description: 'Application name'  // optional
+});
+```
+
+**Update config**:
+```javascript
+const updated = await configClient.update(1, {
+    value: 'NewValue',
+    description: 'Updated description'  // optional
+});
+```
+
+**Delete config**:
+```javascript
+await configClient.delete(1);
+```
+
+**Error handling**:
+```javascript
+try {
+    await configClient.list();
+} catch (error) {
+    console.error(`Error: ${error.message}`);
+    console.error(`Status: ${error.status}`);
+    console.error(`Response:`, error.response);
+}
+```
+
+### Current Consumers
+
+1. **admin.html** — Professional admin dashboard using client library
+2. **index.html + app.js** — Main app interface using client library
+
+### Benefits of Library Abstraction
+
+- **Single responsibility**: All API logic in one place
+- **Breaking change safety**: Update library; apps work without changes
+- **Consistent errors**: All consumers handle errors the same way
+- **Testability**: Can mock ConfigClient in tests
+- **Future enhancements**: Add caching, retries, metrics in library without changing consumers
+
+## Frontend Patterns
 
 **Purpose**: Static HTML page structure
 

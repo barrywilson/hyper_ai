@@ -11,6 +11,7 @@ This file directs the AI assistant to load the following context documents at th
 1. **[memory/ABOUT.md](./memory/ABOUT.md)** — Project purpose, scope, personas, and core principles
 2. **[memory/ARCHITECTURE.md](./memory/ARCHITECTURE.md)** — System design, data flow, and technical patterns
 3. **[memory/IMPLEMENTATION.md](./memory/IMPLEMENTATION.md)** — Implementation details, coding conventions, and best practices
+4. **[memory/CLIENT_LIBRARY.md](./memory/CLIENT_LIBRARY.md)** — Client library design, API, and usage patterns
 
 ## Quick Context
 
