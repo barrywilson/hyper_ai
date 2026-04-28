@@ -5,8 +5,8 @@
  * Uses server-side resolver pattern - all requests POST to resolver.
  */
 
-// Initialize API with resolver pattern
-const api = createApi({
+// Initialize configApi with resolver pattern
+const configApi = createApi({
     namespace: 'ai.course.config',
     version: 'v1',
     baseUrl: '/api'
@@ -21,15 +21,15 @@ const configDescription = document.getElementById('config-description');
 const submitBtn = document.getElementById('submit-btn');
 const cancelBtn = document.getElementById('cancel-btn');
 const formTitle = document.getElementById('form-title');
-const configTbody = document.getElementById('config-tbody');
 const messageDiv = document.getElementById('message');
 const loadingDiv = document.getElementById('loading');
 
 // State
 let isEditing = false;
+let configTable = document.getElementById('config-table');
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {    
     loadConfigurations();
     setupEventListeners();
 });
@@ -40,6 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
     configForm.addEventListener('submit', handleFormSubmit);
     cancelBtn.addEventListener('click', resetForm);
+    
+    // Listen for single custom element event
+    document.addEventListener('config-action', (e) => {
+        const { action, id } = e.detail;
+        if (action === 'edit') {
+            editConfiguration(id);
+        } else if (action === 'delete') {
+            deleteConfiguration(id);
+        }
+    });
 }
 
 /**
@@ -50,8 +60,11 @@ async function loadConfigurations() {
         showLoading(true);
         hideMessage();
         
-        const configurations = await api('list');
-        renderConfigurations(configurations);
+        const configurations = await configApi('list');
+        console.log('Loaded configurations:', configurations);
+        if (configTable) {
+            configTable.data = configurations;
+        }
         
     } catch (error) {
         console.error('Error loading configurations:', error);
@@ -59,38 +72,6 @@ async function loadConfigurations() {
     } finally {
         showLoading(false);
     }
-}
-
-/**
- * Render configurations in table
- */
-function renderConfigurations(configurations) {
-    if (!configurations || configurations.length === 0) {
-        configTbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px; color: #999;">
-                    No configurations found. Add your first configuration above.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    configTbody.innerHTML = configurations.map(config => `
-        <tr>
-            <td>${config.id}</td>
-            <td><strong>${escapeHtml(config.key)}</strong></td>
-            <td>${escapeHtml(config.value)}</td>
-            <td>${config.description ? escapeHtml(config.description) : '-'}</td>
-            <td>${formatDate(config.created_at)}</td>
-            <td>
-                <div class="actions" style="display: flex; gap: 5px;">
-                    <button class="btn btn-edit" style="background: #4ecdc4; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;" onclick="editConfiguration(${config.id})">Edit</button>
-                    <button class="btn btn-delete" style="background: #ff6b6b; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px;" onclick="deleteConfiguration(${config.id})">Delete</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
 }
 
 /**
@@ -112,7 +93,7 @@ async function handleFormSubmit(e) {
         if (isEditing) {
             // Update existing configuration
             const id = parseInt(configId.value);
-            await api('update', {
+            await configApi('update', {
                 id,
                 value,
                 description: description || null
@@ -120,7 +101,7 @@ async function handleFormSubmit(e) {
             showMessage('Configuration updated successfully', 'success');
         } else {
             // Create new configuration
-            await api('create', {
+            await configApi('create', {
                 key_name: keyName,
                 value,
                 description: description || null
@@ -141,11 +122,11 @@ async function handleFormSubmit(e) {
  */
 async function editConfiguration(id) {
     try {
-        const config = await api('get', { id });
+        const config = await configApi('get', { id });
         
         configId.value = config.id;
         configKey.value = config.key_name;
-        configKey.disabled = true; // Don't allow key name changes
+        configKey.disabled = true;
         configValue.value = config.value;
         configDescription.value = config.description || '';
         
@@ -154,7 +135,6 @@ async function editConfiguration(id) {
         submitBtn.textContent = 'Update Configuration';
         cancelBtn.style.display = 'inline-block';
         
-        // Scroll to form
         configForm.scrollIntoView({ behavior: 'smooth' });
         configValue.focus();
     } catch (error) {
@@ -172,7 +152,7 @@ async function deleteConfiguration(id) {
     }
     
     try {
-        await api('delete', { id });
+        await configApi('delete', { id });
         showMessage('Configuration deleted successfully', 'success');
         loadConfigurations();
     } catch (error) {
@@ -209,7 +189,6 @@ function showMessage(text, type) {
     messageDiv.textContent = text;
     messageDiv.className = `message ${type}`;
     
-    // Auto-hide success messages after 5 seconds
     if (type === 'success') {
         setTimeout(hideMessage, 5000);
     }
@@ -221,21 +200,4 @@ function showMessage(text, type) {
 function hideMessage() {
     messageDiv.className = 'message';
     messageDiv.textContent = '';
-}
-
-/**
- * Format date for display
- */
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-}
-
-/**
- * Escape HTML special characters to prevent XSS
- */
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }

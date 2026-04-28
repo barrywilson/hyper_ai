@@ -3,6 +3,9 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// Initialize database connection
+const pool = require('./db');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,7 +20,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API Resolver - Universal endpoint for all API requests
 app.post('/api/resolve', async (req, res) => {
   const { namespace, version, action, params,mappings } = req.body;
-  console.log({ namespace, version, action, params,mappings } )
   // Validate required fields
   if (!namespace || !version || !action) {
     return res.status(400).json({ 
@@ -31,7 +33,7 @@ app.post('/api/resolve', async (req, res) => {
     const resolver = require(resolverPath);
     
     // Execute the resolver
-    const result = await resolver.resolve({action, params,mappings});
+    const result = await resolver.resolve(pool,{action, params,mappings});
     
     // Handle the result
     if (result.error) {
