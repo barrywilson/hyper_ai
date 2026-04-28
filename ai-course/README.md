@@ -68,10 +68,15 @@ To test that the database is set up correctly and contains the expected data, ru
 
 ```bash
 docker exec -it mysql_sample mysql -u my_user -p sample_db -e "SELECT * FROM configurations;"
-```
 
+```
 Enter the password when prompted.
 
+```bash
+For testing
+docker compose down -v
+docker compose up -d
+```
 You should see output showing the sample configurations (app_name, max_connections, debug_mode).
 
 ### 5. Configure environment variables
