@@ -71,6 +71,146 @@ customElements.define('element-name', class extends HTMLElement {
 });
 ```
 
+## Advanced Pattern: Slot-Like Behavior
+
+For components that need flexible content injection (like headers, layouts):
+
+```javascript
+/**
+ * AppHeader Custom Element
+ * Reusable header with slot-like behavior
+ * 
+ * Usage:
+ * <app-header>
+ *   <div slot="title">
+ *     <h1>Page Title</h1>
+ *     <p>Subtitle</p>
+ *   </div>
+ *   <div slot="actions">
+ *     <a href="...">Link</a>
+ *   </div>
+ * </app-header>
+ */
+
+customElements.define('app-header', class extends HTMLElement {
+  
+  connectedCallback() {
+    // Extract slot content before rendering
+    const titleSlot = this.querySelector('[slot="title"]');
+    const actionsSlot = this.querySelector('[slot="actions"]');
+    
+    // Store the innerHTML
+    const titleContent = titleSlot ? titleSlot.innerHTML : '<h1>Default Title</h1>';
+    const actionsContent = actionsSlot ? actionsSlot.innerHTML : '';
+    
+    // Render the header structure
+    this.innerHTML = `
+      <header>
+        <div>
+          ${titleContent}
+        </div>
+        <div class="nav-links">
+          ${actionsContent}
+        </div>
+      </header>
+    `;
+  }
+  
+});
+```
+
+**Benefits:**
+- Reusable across multiple pages
+- Consistent structure with flexible content
+- No need for Shadow DOM
+- Simple slot-like behavior using `[slot="name"]` attributes
+
+## Advanced Pattern: Conditional Rendering
+
+For components that need different modes (like read-only vs editable):
+
+```javascript
+/**
+ * DataTable Custom Element
+ * Table with optional read-only mode
+ */
+
+const renderTable = (element, configurations) => {  
+  const isReadonly = element.hasAttribute('readonly');
+  
+  const rows = configurations.map(config => `
+    <tr>
+      <td>${config.id}</td>
+      <td>${config.name}</td>
+      ${!isReadonly ? `
+      <td>
+        <div class="actions">
+          <button data-action="edit" data-id="${config.id}">Edit</button>
+          <button data-action="delete" data-id="${config.id}">Delete</button>
+        </div>
+      </td>
+      ` : ''}
+    </tr>
+  `).join('');
+  
+  element.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          ${!isReadonly ? '<th>Actions</th>' : ''}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+  
+  // Only add event listeners if not readonly
+  if (!isReadonly) {
+    element.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        element.dispatchEvent(new CustomEvent('table-action', { 
+          detail: { 
+            action: e.target.dataset.action,
+            id: parseInt(e.target.dataset.id)
+          },
+          bubbles: true 
+        }));
+      });
+    });
+  }
+};
+
+customElements.define('data-table', class extends HTMLElement {
+  
+  connectedCallback() {
+    this.innerHTML = `<p>Loading...</p>`;
+  }
+  
+  set data(configurations) {
+    this._data = configurations;
+    renderTable(this, configurations);
+  }
+
+});
+```
+
+**Usage:**
+```html
+<!-- Editable table -->
+<data-table id="editTable"></data-table>
+
+<!-- Read-only table -->
+<data-table id="viewTable" readonly></data-table>
+```
+
+**Benefits:**
+- Single component for multiple use cases
+- Attribute-based configuration
+- Cleaner codebase (no duplicate components)
+- Easy to maintain
+
 ## Key Principles
 
 ### 1. Keep It Simple
@@ -98,7 +238,51 @@ customElements.define('element-name', class extends HTMLElement {
 - Keep it simple
 - Easier to debug
 
+### 6. Slot-Like Behavior
+- Read innerHTML before rendering
+- Use `[slot="name"]` attributes for content areas
+- Re-render with structured layout
+
+### 7. Conditional Rendering
+- Use attributes for modes: `readonly`, `disabled`, etc.
+- Check with `element.hasAttribute('readonly')`
+- Single component, multiple behaviors
+
 ## Examples from Project
+
+### app-header.js (~40 lines)
+```javascript
+/**
+ * AppHeader Custom Element
+ * Reusable header component with slot-like behavior
+ */
+
+customElements.define('app-header', class extends HTMLElement {
+  
+  connectedCallback() {
+    // Extract slot content before rendering
+    const titleSlot = this.querySelector('[slot="title"]');
+    const actionsSlot = this.querySelector('[slot="actions"]');
+    
+    // Store the innerHTML
+    const titleContent = titleSlot ? titleSlot.innerHTML : '<h1>Configuration Service</h1><p>Manage your application configurations</p>';
+    const actionsContent = actionsSlot ? actionsSlot.innerHTML : '';
+    
+    // Render the header structure
+    this.innerHTML = `
+      <header>
+        <div>
+          ${titleContent}
+        </div>
+        <div class="nav-links">
+          ${actionsContent}
+        </div>
+      </header>
+    `;
+  }
+  
+});
+```
 
 ### app-message.js (~35 lines)
 ```javascript
@@ -154,34 +338,63 @@ customElements.define('app-loading', class extends HTMLElement {
 });
 ```
 
-### config-table.js (~110 lines)
+### config-table.js (~75 lines with readonly support)
 ```javascript
+const escapeHtml = (text) => {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+};
+
 const renderTable = (element, configurations) => {
+  const isReadonly = element.hasAttribute('readonly');
+  
   const rows = configurations.map(config => `
     <tr>
       <td>${config.id}</td>
-      <td><button data-action="edit" data-id="${config.id}">Edit</button></td>
+      <td><strong>${escapeHtml(config.key)}</strong></td>
+      <td>${escapeHtml(config.value)}</td>
+      ${!isReadonly ? `
+      <td>
+        <button data-action="edit" data-id="${config.id}">Edit</button>
+        <button data-action="delete" data-id="${config.id}">Delete</button>
+      </td>
+      ` : ''}
     </tr>
   `).join('');
   
-  element.innerHTML = `<table><tbody>${rows}</tbody></table>`;
+  element.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Key</th>
+          <th>Value</th>
+          ${!isReadonly ? '<th>Actions</th>' : ''}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
   
-  element.querySelectorAll('button[data-action]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      element.dispatchEvent(new CustomEvent('config-action', { 
-        detail: { 
-          action: e.target.dataset.action,
-          id: parseInt(e.target.dataset.id)
-        },
-        bubbles: true 
-      }));
+  if (!isReadonly) {
+    element.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        element.dispatchEvent(new CustomEvent('config-action', { 
+          detail: { 
+            action: e.target.dataset.action,
+            id: parseInt(e.target.dataset.id)
+          },
+          bubbles: true 
+        }));
+      });
     });
-  });
+  }
 };
 
 customElements.define('config-table', class extends HTMLElement {
   connectedCallback() {
-    renderTable(this, this._data);
+    this.innerHTML = `<p>Loading configurations...</p>`;
   }
   
   set data(configurations) {
@@ -204,22 +417,103 @@ src/public/elements/my-element.js
 <script src="elements/my-element.js"></script>
 ```
 
-### 3. Use in JavaScript
-```javascript
-const myElement = document.getElementById('myElement');
+### 3. Use in JavaScript (Inline or External)
+```html
+<script>
+  const myElement = document.getElementById('myElement');
+  
+  // Set data
+  myElement.data = someData;
+  
+  // Call methods
+  myElement.show();
+  myElement.hide();
+  
+  // Listen for events
+  document.addEventListener('element-action', (e) => {
+    const { action, value } = e.detail;
+    // Handle action
+  });
+</script>
+```
 
-// Set data
-myElement.data = someData;
+## Page Organization Patterns
 
-// Call methods
-myElement.show();
-myElement.hide();
+### Simple Read-Only Page (Inline Script)
+For simple pages with minimal logic (~50 lines), use inline scripts:
 
-// Listen for events
-document.addEventListener('element-action', (e) => {
-  const { action, value } = e.detail;
-  // Handle action
-});
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <app-header>
+      <div slot="title">
+        <h1>My Page</h1>
+      </div>
+      <div slot="actions">
+        <a href="admin.html">Admin</a>
+      </div>
+    </app-header>
+    
+    <main>
+      <data-table id="table" readonly></data-table>
+    </main>
+  </div>
+  
+  <script src="api-client.js"></script>
+  <script src="elements/app-header.js"></script>
+  <script src="elements/data-table.js"></script>
+  <script>
+    // Simple page logic inline
+    const api = createApi({ namespace: 'data', version: 'v1', baseUrl: '/api' });
+    const table = document.getElementById('table');
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      const data = await api('list');
+      table.data = data;
+    });
+  </script>
+</body>
+</html>
+```
+
+### Complex Interactive Page (External Script)
+For complex pages with lots of logic (>100 lines), use external scripts:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <app-header>
+      <div slot="title">
+        <h1>Admin Dashboard</h1>
+      </div>
+      <div slot="actions">
+        <a href="index.html">Back</a>
+      </div>
+    </app-header>
+    
+    <main>
+      <data-table id="table"></data-table>
+    </main>
+  </div>
+  
+  <script src="api-client.js"></script>
+  <script src="elements/app-header.js"></script>
+  <script src="elements/data-table.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
 ```
 
 ## Anti-Patterns to Avoid
@@ -244,6 +538,11 @@ document.addEventListener('element-action', (e) => {
 - Cleaner HTML
 - Better separation
 
+❌ **Don't create separate files for tiny scripts**
+- Use inline `<script>` tags for simple pages
+- Only create external files when logic is complex
+- Keep it simple!
+
 ## Checklist for New Elements
 
 - [ ] Create file in `elements/` directory
@@ -252,6 +551,26 @@ document.addEventListener('element-action', (e) => {
 - [ ] Register with `customElements.define()`
 - [ ] Add simple public API methods
 - [ ] Use single custom event pattern
+- [ ] Consider slot-like behavior for flexible content
+- [ ] Consider conditional rendering for multiple modes
 - [ ] Add to HTML with proper script order
 - [ ] Test in browser
 - [ ] Keep it simple!
+
+## When to Use Each Pattern
+
+### Basic Pattern
+- Simple display components
+- No content injection needed
+- Single purpose
+
+### Slot-Like Behavior
+- Layout components (headers, footers, cards)
+- Need flexible content areas
+- Reusable across pages with different content
+
+### Conditional Rendering
+- Components with multiple modes
+- Read-only vs editable views
+- Enabled vs disabled states
+- Avoid duplicating similar components
