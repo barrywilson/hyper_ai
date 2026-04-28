@@ -8,15 +8,11 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div>
-                <h1>⚙️ Admin Dashboard</h1>
-                <p>Configuration Management</p>
-            </div>
-            <div class="nav-links">
+        <app-header heading="⚙️ Admin Dashboard" subheading="Configuration Management">           
+            <div slot="actions">
                 <a href="index.html">← Back to App</a>
             </div>
-        </header>
+        </app-header>
 
         <main>
             <!-- Dashboard Stats -->
@@ -91,6 +87,7 @@
     </div>
 
     <script src="api-client.js"></script>
+    <script src="elements/app-header.js"></script>
     <script src="elements/app-message.js"></script>
     <script src="elements/app-loading.js"></script>
     <script src="elements/config-table.js"></script>

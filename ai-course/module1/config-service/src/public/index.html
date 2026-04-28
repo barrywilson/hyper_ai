@@ -8,15 +8,11 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div>
-                <h1>Configuration Service</h1>
-                <p>Manage your application configurations</p>
+        <app-header heading="Configuration Service" subheading="Manage your application configurations">         
+            <div slot="actions">
+                <a href="admin.html">⚙️ Admin Dashboard</a>
             </div>
-            <div style="text-align: right;">
-                <a href="admin.html" style="color: white; text-decoration: none; font-size: 14px; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 6px; display: inline-block;">⚙️ Admin Dashboard</a>
-            </div>
-        </header>
+        </app-header>
 
         <main>
             <!-- Configurations Table -->
@@ -33,9 +29,56 @@
     </div>
 
     <script src="api-client.js"></script>
+    <script src="elements/app-header.js"></script>
     <script src="elements/app-message.js"></script>
     <script src="elements/app-loading.js"></script>
     <script src="elements/config-table.js"></script>
-    <script src="index.js"></script>
+    <script>
+        /**
+         * Configuration Service Web App - Read-Only View
+         * 
+         * Simple web interface for viewing configurations.
+         * Uses server-side resolver pattern - all requests POST to resolver.
+         */
+
+        // Initialize configApi with resolver pattern
+        const configApi = createApi({
+            namespace: 'ai.course.config',
+            version: 'v1',
+            baseUrl: '/api'
+        });
+
+        // DOM Elements
+        const message = document.getElementById('message');
+        const loading = document.getElementById('loading');
+        const configTable = document.getElementById('config-table');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {    
+            loadConfigurations();
+        });
+
+        /**
+         * Load all configurations from API
+         */
+        async function loadConfigurations() {
+            try {
+                loading.show();
+                message.hide();
+                
+                const configurations = await configApi('list');
+                
+                if (configTable) {
+                    configTable.data = configurations;
+                }
+                
+            } catch (error) {
+                console.error('Error loading configurations:', error);
+                message.show('Failed to load configurations: ' + error.message, 'error');
+            } finally {
+                loading.hide();
+            }
+        }
+    </script>
 </body>
 </html>
