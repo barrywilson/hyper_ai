@@ -34,13 +34,18 @@ const formatDate = (dateString) => {
 };
 ```
 
-### 3. No Inline Styles in HTML
+### 3. No Inline Styles in HTML (Except Rare Cases)
 ```html
-<!-- ❌ Don't -->
+<!-- ❌ Don't (usually) -->
 <div style="color: red; padding: 10px;">Text</div>
 
 <!-- ✅ Do -->
 <div class="error-message">Text</div>
+
+<!-- ✅ OK for one-off positioning/layout -->
+<div style="text-align: right;">
+  <a href="admin.html">Admin</a>
+</div>
 ```
 
 ### 4. No Inline Event Handlers
@@ -64,7 +69,8 @@ element.dispatchEvent(new CustomEvent('item-action', {
   detail: { 
     action: 'edit', // or 'delete', 'view'
     id: 123 
-  }
+  },
+  bubbles: true
 }));
 ```
 
@@ -75,7 +81,7 @@ element.dispatchEvent(new CustomEvent('item-action', {
 **Client:**
 ```javascript
 const api = createApi({
-  namespace: 'configs',
+  namespace: 'ai.course.config',
   version: 'v1',
   baseUrl: '/api'
 });
@@ -86,7 +92,7 @@ await api('get', { id: 1 });
 
 **Server:**
 ```javascript
-// Dynamically loads: ./resolvers/configs.v1.js
+// Dynamically loads: ./resolvers/ai.course.config.v1.js
 const resolver = require(`./resolvers/${namespace}.${version}`);
 const result = await resolver.resolve({ action, params, mappings });
 ```
@@ -104,7 +110,7 @@ async function resolve({ action, params, mappings }) {
 
 ### Custom Element Pattern
 
-**Element:**
+**Basic Element:**
 ```javascript
 const renderElement = (element, data) => {
   element.innerHTML = `<div>${data}</div>`;
@@ -118,14 +124,62 @@ customElements.define('my-element', class extends HTMLElement {
 });
 ```
 
+**Slot-Like Behavior (for layouts):**
+```javascript
+customElements.define('app-header', class extends HTMLElement {
+  connectedCallback() {
+    const titleSlot = this.querySelector('[slot="title"]');
+    const actionsSlot = this.querySelector('[slot="actions"]');
+    
+    const titleContent = titleSlot ? titleSlot.innerHTML : '<h1>Default</h1>';
+    const actionsContent = actionsSlot ? actionsSlot.innerHTML : '';
+    
+    this.innerHTML = `
+      <header>
+        <div>${titleContent}</div>
+        <div class="nav-links">${actionsContent}</div>
+      </header>
+    `;
+  }
+});
+```
+
+**Conditional Rendering (for modes):**
+```javascript
+const renderTable = (element, data) => {
+  const isReadonly = element.hasAttribute('readonly');
+  
+  element.innerHTML = `
+    <table>
+      ${data.map(item => `
+        <tr>
+          <td>${item.name}</td>
+          ${!isReadonly ? `<td><button>Edit</button></td>` : ''}
+        </tr>
+      `).join('')}
+    </table>
+  `;
+  
+  if (!isReadonly) {
+    // Add event listeners only when editable
+  }
+};
+```
+
 **Usage:**
 ```html
-<my-element id="myElement"></my-element>
-<script src="elements/my-element.js"></script>
-<script>
-  const el = document.getElementById('myElement');
-  el.data = someData;
-</script>
+<!-- Reusable header -->
+<app-header>
+  <div slot="title">
+    <h1>My Page</h1>
+  </div>
+  <div slot="actions">
+    <a href="admin.html">Admin</a>
+  </div>
+</app-header>
+
+<!-- Read-only table -->
+<data-table id="table" readonly></data-table>
 ```
 
 ## File Organization
@@ -134,19 +188,118 @@ customElements.define('my-element', class extends HTMLElement {
 src/
 ├── public/
 │   ├── elements/          # Custom elements
-│   │   ├── app-message.js
-│   │   ├── app-loading.js
-│   │   └── config-table.js
+│   │   ├── app-header.js  # Reusable header (~40 lines)
+│   │   ├── app-message.js # Message display (~35 lines)
+│   │   ├── app-loading.js # Loading indicator (~25 lines)
+│   │   └── config-table.js # Data table (~75 lines)
 │   ├── api-client.js      # Universal API client
-│   ├── index.html         # Main page
-│   ├── index.js           # Main app logic
-│   ├── admin.html         # Admin page
+│   ├── index.html         # Main page (with inline script)
+│   ├── admin.html         # Admin page (with inline script)
 │   └── style.css          # Unified styles
 ├── resolvers/             # API resolvers
 │   └── namespace.v1.js
 ├── server.js              # Express server
 └── db.js                  # Database connection
 ```
+
+## Page Organization
+
+### Simple Pages: Inline Scripts
+For pages with minimal logic (~50 lines), use inline `<script>` tags:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Configuration Service</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <app-header>
+      <div slot="title">
+        <h1>Configuration Service</h1>
+        <p>View configurations</p>
+      </div>
+      <div slot="actions">
+        <a href="admin.html">Admin Dashboard</a>
+      </div>
+    </app-header>
+    
+    <main>
+      <config-table id="config-table" readonly></config-table>
+    </main>
+  </div>
+  
+  <script src="api-client.js"></script>
+  <script src="elements/app-header.js"></script>
+  <script src="elements/config-table.js"></script>
+  <script>
+    // Simple page logic inline
+    const configApi = createApi({
+      namespace: 'ai.course.config',
+      version: 'v1',
+      baseUrl: '/api'
+    });
+    
+    const configTable = document.getElementById('config-table');
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      const configurations = await configApi('list');
+      configTable.data = configurations;
+    });
+  </script>
+</body>
+</html>
+```
+
+**Benefits:**
+- One less HTTP request
+- Logic co-located with markup
+- Easier to understand page behavior
+- Perfect for simple read-only views
+
+### Complex Pages: External Scripts
+For pages with complex logic (>100 lines), use external scripts:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <app-header>
+      <div slot="title">
+        <h1>Admin Dashboard</h1>
+      </div>
+      <div slot="actions">
+        <a href="index.html">Back</a>
+      </div>
+    </app-header>
+    
+    <main>
+      <config-table id="config-table"></config-table>
+    </main>
+  </div>
+  
+  <script src="api-client.js"></script>
+  <script src="elements/app-header.js"></script>
+  <script src="elements/config-table.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
+```
+
+**When to use external scripts:**
+- Complex form handling
+- Multiple event listeners
+- State management
+- Modal dialogs
+- Search/filter logic
+- >100 lines of JavaScript
 
 ## Code Style
 
@@ -160,8 +313,8 @@ src/
 ### HTML
 - Semantic elements
 - Custom elements for reusable components
-- No inline styles
-- No inline scripts (except small page-specific logic)
+- Minimal inline styles (only for one-off positioning)
+- No inline scripts (except page-specific logic in `<script>` tags)
 
 ### CSS
 - Single stylesheet for entire app
@@ -220,11 +373,13 @@ try {
 ```javascript
 async function loadData() {
   try {
-    loadingEl.style.display = 'block';
+    loading.show();
     const data = await api('list');
     element.data = data;
+  } catch (error) {
+    message.show(error.message, 'error');
   } finally {
-    loadingEl.style.display = 'none';
+    loading.hide();
   }
 }
 ```
@@ -308,9 +463,13 @@ PORT=3000
 3. **Single events** - One event with action payload
 4. **Modular** - Separate concerns clearly
 5. **Reusable** - Custom elements for UI components
-6. **Dynamic** - Load resolvers on-demand
-7. **Testable** - Easy to test and debug
-8. **Documented** - Clear templates and guidelines
+6. **Slot-like behavior** - Flexible content injection without Shadow DOM
+7. **Conditional rendering** - Single component, multiple modes
+8. **Inline scripts for simple pages** - Co-locate logic with markup
+9. **External scripts for complex pages** - Separate when logic is substantial
+10. **Dynamic** - Load resolvers on-demand
+11. **Testable** - Easy to test and debug
+12. **Documented** - Clear templates and guidelines
 
 ## When in Doubt
 
@@ -319,5 +478,78 @@ Ask yourself:
 - Can I remove any code?
 - Is this reusable?
 - Will this be easy to maintain?
+- Should this be inline or external?
+- Can one component handle multiple modes?
 
 **If the answer is no, simplify!**
+
+## Elegant Code Patterns
+
+### ✅ Reusable Components with Slots
+```html
+<!-- Same component, different content -->
+<app-header>
+  <div slot="title"><h1>Page 1</h1></div>
+  <div slot="actions"><a href="/">Home</a></div>
+</app-header>
+
+<app-header>
+  <div slot="title"><h1>Page 2</h1></div>
+  <div slot="actions"><a href="/admin">Admin</a></div>
+</app-header>
+```
+
+### ✅ Single Component, Multiple Modes
+```html
+<!-- Same component, different behavior -->
+<config-table id="viewTable" readonly></config-table>
+<config-table id="editTable"></config-table>
+```
+
+### ✅ Inline Scripts for Simplicity
+```html
+<!-- No separate file needed for 30 lines -->
+<script>
+  const api = createApi({ namespace: 'data', version: 'v1', baseUrl: '/api' });
+  document.addEventListener('DOMContentLoaded', async () => {
+    const data = await api('list');
+    document.getElementById('table').data = data;
+  });
+</script>
+```
+
+### ✅ Clean Event Handling
+```javascript
+// Single event, multiple actions
+document.addEventListener('config-action', (e) => {
+  const { action, id } = e.detail;
+  if (action === 'edit') editConfig(id);
+  else if (action === 'delete') deleteConfig(id);
+});
+```
+
+## Anti-Patterns
+
+### ❌ Duplicate Components
+```javascript
+// Don't create separate read-only and editable components
+// Use one component with conditional rendering
+```
+
+### ❌ Separate Files for Tiny Scripts
+```javascript
+// Don't create index.js for 30 lines of code
+// Use inline <script> tag instead
+```
+
+### ❌ Multiple Events for Same Component
+```javascript
+// Don't dispatch different events for each action
+// Use single event with action payload
+```
+
+### ❌ Hardcoded Content in Components
+```javascript
+// Don't hardcode titles/content in components
+// Use slot-like behavior for flexibility
+```
