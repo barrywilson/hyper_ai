@@ -113,16 +113,10 @@ npm run dev
 ### Run tests
 
 ```bash
-npm test
+npm run test
 ```
 
 Tests use the ephemeral database - no mocking needed!
-
-### Run tests in watch mode
-
-```bash
-npm run test:watch
-```
 
 ## Docker Commands
 
