@@ -12,6 +12,7 @@ This file directs the AI assistant to load the following context documents at th
 2. **[memory/ARCHITECTURE.md](./memory/ARCHITECTURE.md)** — System design, data flow, and technical patterns
 3. **[memory/IMPLEMENTATION.md](./memory/IMPLEMENTATION.md)** — Implementation details, coding conventions, and best practices
 4. **[memory/CLIENT_LIBRARY.md](./memory/CLIENT_LIBRARY.md)** — Client library design, API, and usage patterns
+5. **[memory/TESTING.md](./memory/TESTING.md)** — Testing philosophy, integration over unit, ephemeral containers
 
 ## Quick Context
 
@@ -22,7 +23,7 @@ This file directs the AI assistant to load the following context documents at th
 
 ## How to Use This File
 
-**For AI Assistants**: On conversation start, read the three memory files above to understand the project context.
+**For AI Assistants**: On conversation start, read the memory files above to understand the project context.
 
 **For Humans**: Update this file whenever you add a new context document to the `memory/` folder, or when project scope changes significantly.
 
