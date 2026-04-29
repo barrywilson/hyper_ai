@@ -5,14 +5,14 @@
  * No server imports - pure integration testing
  */
 
-const createApi = require('../src/public/api-client');
-const pool = require('../src/db');
+const createApi = require('../public/api-client');
+
 
 // Polyfill fetch for Node.js
 global.fetch = require('node-fetch');
 
 // Configuration
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000/api';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080/api';
 
 // Initialize API client
 const configApi = createApi({
@@ -24,12 +24,8 @@ const configApi = createApi({
 // Test data
 let testConfigId;
 
-describe('Configuration Service Integration Tests', () => {
-  
-  // Clean up after all tests
-  afterAll(async () => {
-    await pool.end();
-  });
+describe('Configuration Service Integration Tests', () => {  
+
 
   describe('List Configurations', () => {
     test('should list all configurations', async () => {
