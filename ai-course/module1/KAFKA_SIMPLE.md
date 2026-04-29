@@ -26,25 +26,18 @@ cd /opt/kafka/bin
 
 ### Create Topic (optional - auto-creates anyway)
 ```bash
-/opt/kafka/bin/kafka-topics.sh --create \
-  --topic test \
-  --bootstrap-server localhost:9092
+/opt/kafka/bin/kafka-topics.sh --create --topic test --bootstrap-server localhost:9092
 ```
 
 ### Produce Messages
 ```bash
-/opt/kafka/bin/kafka-console-producer.sh \
-  --topic test \
-  --bootstrap-server localhost:9092
+/opt/kafka/bin/kafka-console-producer.sh --topic test --bootstrap-server localhost:9092
 ```
 Type messages, press Enter. Ctrl+C to exit.
 
 ### Consume Messages
 ```bash
-/opt/kafka/bin/kafka-console-consumer.sh \
-  --topic test \
-  --from-beginning \
-  --bootstrap-server localhost:9092
+/opt/kafka/bin/kafka-console-consumer.sh --topic test --from-beginning --bootstrap-server localhost:9092
 ```
 
 ## Node.js Connection
@@ -82,7 +75,7 @@ That's it. Everything you need to learn Kafka.
 ❌ Kubernetes  
 ❌ Kafka UI (use CLI tools)
 
-**Why?** You don't need them for learning. Add complexity later when you actually need it.
+**Why?** You don't need them, adds to much complexity, change when later when you actually need it.
 
 ## Common Commands
 
