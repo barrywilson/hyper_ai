@@ -3,6 +3,7 @@
  * 
  * Radical design: Server-side API resolver pattern
  * Client always POSTs to resolver, server handles routing
+ * Not a pure function as relies on fetch which is browser based.  Challenges with testing ensure latest node 18
  * 
  * Usage:
  *   const api = createApi({

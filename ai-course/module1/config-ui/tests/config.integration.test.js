@@ -7,10 +7,6 @@
 
 const createApi = require('../public/api-client');
 
-
-// Polyfill fetch for Node.js
-global.fetch = require('node-fetch');
-
 // Configuration
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080/api';
 
