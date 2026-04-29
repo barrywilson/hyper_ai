@@ -217,7 +217,7 @@ kafka-consume:
 	@echo "📨 Consuming messages from config-events topic..."
 	@echo "Press Ctrl+C to stop"
 	@echo ""
-	docker exec -it kafka kafka-console-consumer \
+	docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh \
 		--bootstrap-server localhost:9092 \
 		--topic config-events \
 		--from-beginning \
@@ -229,7 +229,7 @@ kafka-produce:
 	@echo "📤 Sending test message to config-events topic..."
 	@echo ""
 	@echo '{"eventId":"test-123","eventType":"config.created","timestamp":"'$$(date -u +"%Y-%m-%dT%H:%M:%SZ")'","version":"1.0","source":"manual-test","data":{"id":999,"key":"test_key","value":"test_value","description":"Test configuration"}}' | \
-	docker exec -i kafka kafka-console-producer \
+	docker exec -i kafka /opt/kafka/bin/kafka-console-producer.sh \
 		--bootstrap-server localhost:9092 \
 		--topic config-events \
 		--property "parse.key=true" \
@@ -244,15 +244,15 @@ kafka-status:
 	@echo "Kafka Broker Status"
 	@echo "==================="
 	@echo ""
-	@docker exec kafka kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1 && \
+	@docker exec kafka /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1 && \
 		echo "✅ Kafka broker is healthy" || \
 		echo "❌ Kafka broker is not responding"
 	@echo ""
 	@echo "Topics:"
-	@docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list 2>/dev/null || echo "No topics found"
+	@docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list 2>/dev/null || echo "No topics found"
 	@echo ""
 	@echo "Consumer Groups:"
-	@docker exec kafka kafka-consumer-groups --bootstrap-server localhost:9092 --list 2>/dev/null || echo "No consumer groups found"
+	@docker exec kafka /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list 2>/dev/null || echo "No consumer groups found"
 
 # View Kafka logs
 kafka-logs:
@@ -268,12 +268,12 @@ kafka-shell:
 kafka-list-topics:
 	@echo "Kafka Topics"
 	@echo "============"
-	@docker exec kafka kafka-topics \
+	@docker exec kafka /opt/kafka/bin/kafka-topics.sh \
 		--bootstrap-server localhost:9092 \
 		--list
 	@echo ""
 	@echo "Topic Details:"
-	@docker exec kafka kafka-topics \
+	@docker exec kafka /opt/kafka/bin/kafka-topics.sh \
 		--bootstrap-server localhost:9092 \
 		--describe
 
@@ -282,7 +282,7 @@ kafka-delete-topic:
 	@echo "⚠️  Delete Kafka Topic"
 	@echo "====================="
 	@read -p "Enter topic name to delete: " topic; \
-	docker exec kafka kafka-topics \
+	docker exec kafka /opt/kafka/bin/kafka-topics.sh \
 		--bootstrap-server localhost:9092 \
 		--delete \
 		--topic $$topic

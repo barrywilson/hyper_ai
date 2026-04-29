@@ -66,22 +66,22 @@ docker container prune -f
 
 ### Check Kafka Status
 ```cmd
-docker exec kafka kafka-broker-api-versions --bootstrap-server localhost:9092
+docker exec kafka /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092
 ```
 
 ### List Topics
 ```cmd
-docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 ```
 
 ### Consume Messages
 ```cmd
-docker exec -it kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic config-events --from-beginning
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic config-events --from-beginning
 ```
 
 ### Produce Test Message
 ```cmd
-echo {"test":"message"} | docker exec -i kafka kafka-console-producer --bootstrap-server localhost:9092 --topic config-events
+echo {"test":"message"} | docker exec -i kafka /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic config-events
 ```
 
 ## Application Commands

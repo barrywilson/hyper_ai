@@ -26,14 +26,14 @@ cd /opt/kafka/bin
 
 ### Create Topic (optional - auto-creates anyway)
 ```bash
-./kafka-topics.sh --create \
+/opt/kafka/bin/kafka-topics.sh --create \
   --topic test \
   --bootstrap-server localhost:9092
 ```
 
 ### Produce Messages
 ```bash
-./kafka-console-producer.sh \
+/opt/kafka/bin/kafka-console-producer.sh \
   --topic test \
   --bootstrap-server localhost:9092
 ```
@@ -41,7 +41,7 @@ Type messages, press Enter. Ctrl+C to exit.
 
 ### Consume Messages
 ```bash
-./kafka-console-consumer.sh \
+/opt/kafka/bin/kafka-console-consumer.sh \
   --topic test \
   --from-beginning \
   --bootstrap-server localhost:9092
@@ -88,16 +88,16 @@ That's it. Everything you need to learn Kafka.
 
 ```bash
 # List topics
-docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 
 # Describe topic
-docker exec kafka kafka-topics --bootstrap-server localhost:9092 --describe --topic test
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test
 
 # Delete topic
-docker exec kafka kafka-topics --bootstrap-server localhost:9092 --delete --topic test
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic test
 
 # Check Kafka health
-docker exec kafka kafka-broker-api-versions --bootstrap-server localhost:9092
+docker exec kafka /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092
 
 # View logs
 docker logs -f kafka
