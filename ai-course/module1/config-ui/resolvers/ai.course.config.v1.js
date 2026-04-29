@@ -1,72 +1,82 @@
 /**
  * Configs Namespace Resolver - Version 1
- * Handles all configuration-related actions
+ * Translates resolver actions to REST API calls
  */
 
-
-async function resolve(pool,{action, params,mappings}) {
+async function resolve(fetch, apiUrl, { action, params }) {
+  let url, method, body;
+  // console.log(`Resolving action: ${action} with params: ${JSON.stringify(params)}`);
+  // Translate resolver actions to REST endpoints
   switch (action) {
     case 'list':
-      const [rows] = await pool.query('SELECT * FROM configurations ORDER BY id');
-      return { status: 200, data: rows };
+      url = `${apiUrl}/api/configurations`;
+      method = 'GET';
+      break;
       
     case 'get':
-      if (!params.id) {
+      if (!params?.id) {
         return { status: 400, error: 'ID is required for get action' };
       }
-      const [getRows] = await pool.query('SELECT * FROM configurations WHERE id = ?', [params.id]);
-      if (getRows.length === 0) {
-        return { status: 404, error: 'Configuration not found' };
-      }
-      return { status: 200, data: getRows[0] };
+      url = `${apiUrl}/api/configurations/${params.id}`;
+      method = 'GET';
+      break;
       
     case 'create':
-      if (!params.key || !params.value) {
+      if (!params?.key || !params?.value) {
         return { status: 400, error: 'key and value are required' };
       }
-      try {
-        const [createResult] = await pool.query(
-          'INSERT INTO configurations (`key`, value, description) VALUES (?, ?, ?)',
-          [params.key, params.value, params.description || null]
-        );
-        const [createdRows] = await pool.query('SELECT * FROM configurations WHERE id = ?', [createResult.insertId]);
-        return { status: 200, data: createdRows[0] };
-      } catch (error) {
-        if (error.code === 'ER_DUP_ENTRY') {
-          return { status: 400, error: `Configuration with key '${params.key}' already exists` };
-        }
-        throw error;
-      }
+      url = `${apiUrl}/api/configurations`;
+      method = 'POST';
+      body = {
+        key: params.key,
+        value: params.value,
+        description: params.description || null
+      };
+      break;
       
     case 'update':
-      if (!params.id) {
+      if (!params?.id) {
         return { status: 400, error: 'ID is required for update action' };
       }
-      const [existingRows] = await pool.query('SELECT * FROM configurations WHERE id = ?', [params.id]);
-      if (existingRows.length === 0) {
-        return { status: 404, error: 'Configuration not found' };
-      }
-      await pool.query(
-        'UPDATE configurations SET value = ?, description = ? WHERE id = ?',
-        [params.value, params.description || null, params.id]
-      );
-      const [updatedRows] = await pool.query('SELECT * FROM configurations WHERE id = ?', [params.id]);
-      return { status: 200, data: updatedRows[0] };
+      url = `${apiUrl}/api/configurations/${params.id}`;
+      method = 'PUT';
+      body = {
+        value: params.value,
+        description: params.description || null
+      };
+      break;
       
     case 'delete':
-      if (!params.id) {
+      if (!params?.id) {
         return { status: 400, error: 'ID is required for delete action' };
       }
-      const [deleteCheck] = await pool.query('SELECT * FROM configurations WHERE id = ?', [params.id]);
-      if (deleteCheck.length === 0) {
-        return { status: 404, error: 'Configuration not found' };
-      }
-      await pool.query('DELETE FROM configurations WHERE id = ?', [params.id]);
-      return { status: 204 };
+      url = `${apiUrl}/api/configurations/${params.id}`;
+      method = 'DELETE';
+      break;
       
     default:
       return { status: 400, error: `Unknown action: ${action}` };
   }
+  
+  // Make the REST API call
+  const options = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+  
+  const response = await fetch(url, options);
+  
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return { status: 204 };
+  }
+  
+  const data = await response.json();
+  return { status: response.status, data };
 }
 
 module.exports = { resolve };

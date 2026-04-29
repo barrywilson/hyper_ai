@@ -73,6 +73,7 @@ app.post('/api/configurations', async (req, res) => {
 app.put('/api/configurations/:id', async (req, res) => {
   try {
     const { value, description } = req.body;
+    // console.log(`Updating configuration id=${req.params.id} with value=${value} and description=${description}`);
     
     const [existingRows] = await pool.query('SELECT * FROM configurations WHERE id = ?', [req.params.id]);
     if (existingRows.length === 0) {
