@@ -64,6 +64,43 @@ The speed and design comprehension tips the scale. Despite the cost of fixing bl
 
 ---
 
+## Reflections: Spec → Prompt → Plan → Implement Cycle
+
+### 1. Control vs. Sideways Moments
+**Easy to lose control.**
+
+The AI can quickly take things in unintended directions. Without strong guardrails, it defaults to over-engineering.
+
+### 2. Detail Level Needed
+**More instructions the better, BUT losing control of the controller documents. Too much.**
+
+Paradox: Need detail to guide the AI effectively, but the control documents (AGENTS.md, memory files) themselves became bloated and hard to manage. Finding the right balance is critical.
+
+### 3. Journal Usefulness
+**Helpful when overloaded.**
+
+The journal serves as a cognitive offload tool. When there's too much to track mentally, it becomes valuable. Not overhead—it's a thinking aid.
+
+### 4. Surprises About Not Coding
+**No surprises. Been doing this for some time but not as well organized or caring about cost.**
+
+Already experienced with AI-assisted coding. This exercise was about bringing structure, organization, and cost awareness to the process—not learning the basics.
+
+### 5. Rules Captured
+**All rules just to remind myself what I want to do in the future.**
+
+The rules aren't universal truths—they're personal preferences captured for consistency. Future-self reminders, not commandments.
+
+### 6. What to Do Differently Next Time
+**Make sure these agents are in place first. CRITICAL.**
+
+The AGENTS.md and memory files need to be set up BEFORE starting work. They're the foundation for control. Without them, you're fighting the AI's defaults from the start.
+
+### Meta-Insight
+The cycle works, but only with proper scaffolding. The agents/memory system is non-negotiable—it's the difference between guiding the AI and wrestling with it.
+
+---
+
 ## Session Progress - Config Service Implementation
 
 ### Completed Tasks:
