@@ -1,128 +1,114 @@
-# Dev Containers Guide
+# Dev Container Setup for Config UI
 
-## What are Dev Containers?
+## Overview
 
-Dev Containers let you use a Docker container as your development environment. Your entire dev setup (tools, dependencies, extensions) is defined in code and runs in a container, ensuring everyone on your team has an identical environment.
+This dev container is configured for **config-ui development only**. It provides a clean, isolated Node.js 20 environment for working on the frontend UI service.
 
-## Why Use Them?
+## What's Included
 
-- **Consistency**: Same environment for everyone
-- **Fast Onboarding**: New devs start coding in minutes
-- **Isolation**: Keep project dependencies separate
-- **No Local Setup**: No need to install multiple tool versions on your machine
+- **Node.js 20** runtime
+- **ESLint** extension for code quality
+- **Port 8080** forwarded for the UI
+- **Automatic npm install** on container creation
 
-## Quick Start
+## How to Use
 
-### Prerequisites
-- Docker Desktop
-- VS Code with "Dev Containers" extension
+### 1. Start the Dev Container
 
-### Setup
-1. Create `.devcontainer/devcontainer.json` in your project
-2. Open project in VS Code
-3. Click "Reopen in Container" when prompted
+In VS Code:
+1. Press `F1` or `Ctrl+Shift+P`
+2. Select **"Dev Containers: Reopen in Container"**
+3. Wait for the container to build and start
+4. Dependencies will install automatically
 
-## Basic Configuration
+### 2. Start Required Services Manually
 
-**devcontainer.json** - Main config file:
+The dev container only runs config-ui. You need to start the backend services manually in a **separate terminal** (outside the container):
 
-```json
-{
-  "name": "My Project",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
-  "customizations": {
-    "vscode": {
-      "extensions": ["dbaeumer.vscode-eslint"]
-    }
-  },
-  "forwardPorts": [3000],
-  "postCreateCommand": "npm install"
-}
+```bash
+cd ai-course/module1
+docker-compose up db config-service
 ```
 
-**Key Properties:**
-- `image`: Docker image to use
-- `customizations.vscode.extensions`: VS Code extensions to auto-install
-- `forwardPorts`: Ports to expose from container
-- `postCreateCommand`: Run after container is created
+This starts:
+- **MySQL database** on port 3306
+- **Config Service API** on port 3000
 
-## Common Examples
+### 3. Run the Config UI
 
-### Node.js
-```json
-{
-  "name": "Node.js",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
-  "forwardPorts": [3000],
-  "postCreateCommand": "npm install"
-}
+Inside the dev container terminal:
+
+```bash
+npm start
 ```
 
-### Python
-```json
-{
-  "name": "Python",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11",
-  "postCreateCommand": "pip install -r requirements.txt"
-}
+The UI will be available at `http://localhost:8080`
+
+### 4. Run Tests
+
+Inside the dev container:
+
+```bash
+npm test
 ```
 
-### With Database (docker-compose.yml)
-```yaml
-services:
-  app:
-    image: mcr.microsoft.com/devcontainers/javascript-node:18
-    volumes:
-      - ..:/workspace:cached
-    command: sleep infinity
-  
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_PASSWORD: postgres
+## Architecture
+
+```
+┌─────────────────────────────────────┐
+│   Dev Container (config-ui)         │
+│   - Node.js 20                      │
+│   - Port 8080                       │
+│   - Your workspace                  │
+└─────────────────┬───────────────────┘
+                  │
+                  │ HTTP calls to localhost:3000
+                  │
+┌─────────────────▼───────────────────┐
+│   Docker Compose (manual)           │
+│   - MySQL (port 3306)               │
+│   - Config Service (port 3000)      │
+└─────────────────────────────────────┘
 ```
 
-```json
-{
-  "name": "Full Stack",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "app",
-  "workspaceFolder": "/workspace"
-}
-```
+## Benefits
 
-## Features
-
-Add tools without custom Dockerfiles:
-
-```json
-{
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {"version": "18"},
-    "ghcr.io/devcontainers/features/python:1": {"version": "3.11"}
-  }
-}
-```
-
-Browse features: [containers.dev/features](https://containers.dev/features)
-
-## Common Commands
-
-- **Reopen in Container**: `F1` → `Dev Containers: Reopen in Container`
-- **Rebuild**: `F1` → `Dev Containers: Rebuild Container`
-- **Reopen Locally**: `F1` → `Dev Containers: Reopen Folder Locally`
+✅ **Simple and focused** - only config-ui code in your workspace  
+✅ **Clean environment** - consistent Node.js 20 setup  
+✅ **Isolated dependencies** - no conflicts with your local machine  
+✅ **Easy to start/stop** - just rebuild the container  
 
 ## Troubleshooting
 
-**Container won't start**: Check Docker Desktop is running, view logs with `F1` → `Dev Containers: Show Container Log`
+### Can't connect to config-service
 
-**Slow on Windows**: Use WSL 2 backend, store files in WSL filesystem
+Make sure the backend services are running:
+```bash
+docker-compose ps
+```
 
-**Extensions not working**: Add them to `devcontainer.json` and rebuild
+You should see `config_service_dev` and `mysql_sample` running.
 
-## Resources
+### Port 8080 already in use
 
-- [Official Docs](https://code.visualstudio.com/docs/devcontainers/containers)
-- [Sample Configs](https://github.com/microsoft/vscode-dev-containers)
-- [Dev Container Spec](https://containers.dev/)
+Stop any other services using port 8080:
+```bash
+docker-compose down
+```
+
+### Need to reinstall dependencies
+
+Inside the dev container:
+```bash
+npm install
+```
+
+Or rebuild the container:
+- Press `F1` → **"Dev Containers: Rebuild Container"**
+
+## Next Steps
+
+- Edit files in `ai-course/module1/config-ui/`
+- Changes are reflected immediately (volume mounted)
+- Run tests with `npm test`
+- View UI at `http://localhost:8080`

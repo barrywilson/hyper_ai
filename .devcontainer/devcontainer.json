@@ -1,11 +1,16 @@
 {
-  "name": "My Project",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  "name": "Config UI",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "workspaceFolder": "/workspaces/config-ui",
+  "workspaceMount": "source=${localWorkspaceFolder}/ai-course/module1/config-ui,target=/workspaces/config-ui,type=bind",
   "customizations": {
     "vscode": {
-      "extensions": ["dbaeumer.vscode-eslint"]
+      "extensions": [
+        "dbaeumer.vscode-eslint"
+      ]
     }
   },
-  "forwardPorts": [3000],
-  "postCreateCommand": "npm install"
+  "forwardPorts": [8080],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node"
 }
