@@ -159,3 +159,65 @@ npm test
 - Custom Elements (no frameworks)
 - Docker MySQL (ephemeral testing)
 - Clean, minimal code
+
+---
+
+## Future Enhancements - Real-Time Updates
+
+### Goal: Kafka Integration for Clean UI Updates
+
+**Objective:** Implement pub/sub pattern for real-time configuration updates without polling.
+
+**Architecture Vision:**
+```
+Config Changes → Kafka Topic → WebSocket/SSE → Client Store → UI Update
+```
+
+**Key Components:**
+
+1. **Kafka Producer (Backend)**
+   - Publish config change events to Kafka topic
+   - Event types: `config.created`, `config.updated`, `config.deleted`
+   - Include full config object in event payload
+
+2. **Kafka Consumer (WebSocket Service)**
+   - Subscribe to config change topic
+   - Broadcast events to connected WebSocket clients
+   - Filter events by client subscriptions (optional)
+
+3. **Client Store Library**
+   - Lightweight state management on frontend
+   - Subscribe to WebSocket events
+   - Automatically update local config cache
+   - Emit events for UI components to react to changes
+   - No manual polling or refresh needed
+
+4. **UI Components**
+   - Listen to store events
+   - Auto-update when configs change
+   - Show real-time indicators (e.g., "Config updated by another user")
+   - Optimistic updates with rollback on conflict
+
+**Benefits:**
+- **Real-time**: UI updates instantly when configs change
+- **Clean separation**: Store handles state, UI handles rendering
+- **Scalable**: Kafka handles high-throughput event streams
+- **Efficient**: No polling, no wasted requests
+- **Multi-user**: All connected clients see changes immediately
+
+**Implementation Notes:**
+- Use existing Kafka experience to design event schema
+- Keep store library minimal (no framework dependencies)
+- WebSocket fallback to SSE for older browsers
+- Consider event replay for clients that reconnect
+- Add event versioning for backward compatibility
+
+**Why This Matters:**
+Leverages Kafka expertise to solve real problem: keeping distributed UIs in sync without constant polling. Clean pub/sub pattern separates concerns and scales naturally.
+
+**Next Steps:**
+1. Design Kafka event schema for config changes
+2. Create WebSocket service (separate from REST API)
+3. Build client store library with event subscription
+4. Update UI components to use store
+5. Add real-time indicators and conflict resolution
