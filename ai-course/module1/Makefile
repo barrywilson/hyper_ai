@@ -7,13 +7,15 @@ help:
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Targets:"
-	@echo "  install      Install npm dependencies"
-	@echo "  start        Start the development server"
+	@echo "  install      Install npm dependencies (backend + frontend)"
+	@echo "  start        Start the backend API server"
+	@echo "  start-ui     Start the frontend UI server"
+	@echo "  start-all    Start both backend and frontend"
 	@echo "  test         Run the test suite"
 	@echo "  test-watch   Run tests in watch mode"
 	@echo "  dev          Start server with auto-reload (nodemon)"
-	@echo "  docker-up    Start MySQL database container"
-	@echo "  docker-down  Stop MySQL database container"
+	@echo "  docker-up    Start all Docker containers (db, api, ui)"
+	@echo "  docker-down  Stop all Docker containers"
 	@echo "  docker-clean Remove Docker containers and volumes"
 	@echo "  db-setup     Initialize database with sample data"
 	@echo "  admin        Open admin dashboard in browser"
@@ -26,14 +28,32 @@ help:
 
 # Install dependencies
 install:
-	@echo "Installing dependencies..."
+	@echo "Installing backend dependencies..."
 	cd config-service && npm install
-	@echo "✅ Dependencies installed"
+	@echo "Installing frontend dependencies..."
+	cd config-ui && npm install
+	@echo "✅ All dependencies installed"
 
-# Start development server
+# Start backend API server
 start:
-	@echo "Starting Configuration Service..."
+	@echo "Starting Backend API Service (port 3000)..."
 	cd config-service && npm start
+
+# Start frontend UI server
+start-ui:
+	@echo "Starting Frontend UI Service (port 8080)..."
+	cd config-ui && npm start
+
+# Start both services
+start-all:
+	@echo "Starting all services..."
+	@echo "Note: Run 'make docker-up' first to start database"
+	@echo "Backend API will run on port 3000"
+	@echo "Frontend UI will run on port 8080"
+	@echo ""
+	@echo "Run in separate terminals:"
+	@echo "  Terminal 1: make start"
+	@echo "  Terminal 2: make start-ui"
 
 # Run test suite
 test:
@@ -81,12 +101,12 @@ db-setup:
 # Open admin dashboard
 admin:
 	@echo "Opening admin dashboard..."
-	@which open > /dev/null && open http://localhost:3000/admin.html || echo "Visit http://localhost:3000/admin.html in your browser"
+	@which open > /dev/null && open http://localhost:8080/admin.html || echo "Visit http://localhost:8080/admin.html in your browser"
 
 # Open main app
 app:
 	@echo "Opening main app..."
-	@which open > /dev/null && open http://localhost:3000 || echo "Visit http://localhost:3000 in your browser"
+	@which open > /dev/null && open http://localhost:8080 || echo "Visit http://localhost:8080 in your browser"
 
 # Show logs
 logs:

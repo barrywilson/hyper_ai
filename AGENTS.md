@@ -16,10 +16,11 @@ This file directs the AI assistant to load the following context documents at th
 
 ## Quick Context
 
-- **Project**: Configuration Service API
+- **Project**: Configuration Service (Backend API + Frontend UI)
 - **Purpose**: Lightweight web-based API for managing application configurations
 - **Tech Stack**: Node.js, Express, MySQL, Jest
-- **Status**: Complete basic service; enhancing with admin UI
+- **Architecture**: Separated frontend (port 8080) and backend (port 3000)
+- **Status**: Complete basic service with separated frontend/backend architecture
 
 ## How to Use This File
 
@@ -29,10 +30,10 @@ This file directs the AI assistant to load the following context documents at th
 
 ## Related Files
 
-- [config-service/README.md](./config-service/README.md) — User-facing project documentation
-- [config-service/src/](./config-service/src/) — Implementation directory
-- [config-service/tests/](./config-service/tests/) — Test suite
-- [docker-compose.yml](./docker-compose.yml) — Database setup
+- [ai-course/module1/config-service/](./ai-course/module1/config-service/) — Backend API service
+- [ai-course/module1/config-ui/](./ai-course/module1/config-ui/) — Frontend UI service
+- [ai-course/module1/docker-compose.yml](./ai-course/module1/docker-compose.yml) — Container orchestration
+- [ai-course/module1/Makefile](./ai-course/module1/Makefile) — Development tasks
 
 ## Next Steps
 

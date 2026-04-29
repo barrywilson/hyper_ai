@@ -36,5 +36,20 @@ services:
     depends_on:
       - db
 
+  config-ui:
+    image: node:20
+    container_name: config_ui_dev
+    working_dir: /workspace
+    volumes:
+      - ./config-ui:/workspace
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - API_URL=http://config-service:3000
+    command: sh -c "npm install && node server.js"
+    depends_on:
+      - config-service
+
 volumes:
   mysql_data:
