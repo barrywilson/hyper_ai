@@ -4,6 +4,57 @@ description: "Configuration Service project context. Auto-loads project memory o
 
 # Configuration Service - Project Context
 
+## Core Principles for AI Assistants
+
+### 1. Anti-Bloatware Rules (CRITICAL)
+- **Keep it simple** - No bloatware, ever
+- **The best code is no code** - The second best is minimal code that does the job
+- **Strip down "comprehensive" solutions** - AI defaults to verbose; user wants minimal
+- **No future-proofing** - Don't create infrastructure for features that don't exist yet
+- **When user says "no junk," they mean it** - Don't offer multiple files/scripts as solution
+- **One file > many files** - Single reference document beats 15+ batch scripts
+- **Question complexity** - If it seems too complex, it probably is
+
+### 2. Cost Awareness (EVERY LINE COSTS MONEY)
+- **Bloat = wasted tokens = wasted money** - Every unnecessary line costs real money
+- **Use Plan mode first** - Discuss options before implementing to avoid creating unwanted files
+- **Don't create files that need deletion** - Think before generating
+- **Avoid layers of abstraction** - Makefile → script → docker command = bloat
+- **106 lines when 1 line works = waste** - Always seek the minimal solution
+
+### 3. AI Behavior Patterns to Avoid
+- **"Comprehensive" ≠ "Better"** - AI defaults to more; user wants less
+- **Don't add abstraction layers** - Direct commands > wrapper scripts > wrapper Makefiles
+- **Don't create for non-existent features** - Only build what's needed now
+- **Reject verbose solutions** - No 515-line READMEs, no 212-line .gitignores
+- **No framework-heavy defaults** - Keep dependencies minimal
+- **Don't repeat mistakes** - If user says "don't do X," never do X again
+
+### 4. Windows Development
+- **No multiple batch files** - Don't create 15+ .bat files for each command
+- **Single reference document** - Show actual commands in one .md file
+- **User empowerment** - Let user run commands directly, don't over-automate
+- **Optional make installation** - Suggest it, don't force alternatives
+
+### 5. Decision Framework
+Before generating code, ask:
+1. **Is this actually needed?** - Or is it future-proofing?
+2. **Can this be simpler?** - What's the minimal solution?
+3. **Does this add value?** - Or is it just wrapping existing commands?
+4. **Will this cost money to fix later?** - Avoid creating cleanup work
+
+### 6. When User Pushes Back
+- **"Too much bloat"** → Strip it down immediately, don't defend it
+- **"No junk"** → Remove everything non-essential
+- **"Too wordy"** → Cut explanations, focus on what not why
+- **"This is too complex"** → Simplify, don't explain why it's complex
+
+### 7. Project-Specific Rules
+- **Node.js only** - No Python, no other languages unless explicitly requested
+- **No extra dependencies** - Get approval before adding packages
+- **Basic web/API structure** - Keep architecture simple
+- **Ask questions** - Don't assume, clarify requirements first
+
 ## Auto-Loading Memory Files
 
 This file directs the AI assistant to load the following context documents at the start of every conversation:

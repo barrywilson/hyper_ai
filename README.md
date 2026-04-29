@@ -96,7 +96,12 @@ docker-compose down -v
 
 # Access MySQL shell
 docker exec -it mysql_sample mysql -u my_user -p sample_db
+
+# Kafka examples
+docker-compose up -d zookeeper kafka kafka-ui
 ```
+
+
 
 ## API Architecture: Resolver Pattern
 

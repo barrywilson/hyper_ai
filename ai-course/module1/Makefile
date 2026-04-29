@@ -1,4 +1,4 @@
-.PHONY: help install start test dev docker-up docker-down clean admin db-setup logs
+.PHONY: help install start test dev docker-up docker-down clean admin db-setup logs kafka-up kafka-down kafka-topics kafka-ui kafka-consume kafka-produce kafka-status kafka-logs kafka-shell
 
 # Default target - show help
 help:
@@ -14,7 +14,7 @@ help:
 	@echo "  test         Run the test suite"
 	@echo "  test-watch   Run tests in watch mode"
 	@echo "  dev          Start server with auto-reload (nodemon)"
-	@echo "  docker-up    Start all Docker containers (db, api, ui)"
+	@echo "  docker-up    Start all Docker containers (db, api, ui, kafka)"
 	@echo "  docker-down  Stop all Docker containers"
 	@echo "  docker-clean Remove Docker containers and volumes"
 	@echo "  db-setup     Initialize database with sample data"
@@ -24,6 +24,16 @@ help:
 	@echo "  clean        Remove node_modules and build artifacts"
 	@echo "  reset        Full reset (clean + docker-clean)"
 	@echo "  status       Show current service status"
+	@echo ""
+	@echo "Kafka Targets:"
+	@echo "  kafka-up     Start Kafka + Zookeeper + Kafka UI"
+	@echo "  kafka-down   Stop Kafka services"
+	@echo "  kafka-ui     Open Kafka UI in browser"
+	@echo "  kafka-consume Tail config-events topic"
+	@echo "  kafka-produce Send test message to config-events"
+	@echo "  kafka-status Check Kafka broker health"
+	@echo "  kafka-logs   View Kafka container logs"
+	@echo "  kafka-shell  Open Kafka container shell"
 	@echo ""
 
 # Install dependencies
@@ -181,3 +191,124 @@ diagnose:
 	@echo "- CONFIG_SERVICE: $(shell [ -d 'config-service' ] && echo '✅ Found' || echo '❌ Not found')"
 	@echo "- package.json: $(shell [ -f 'config-service/package.json' ] && echo '✅ Found' || echo '❌ Not found')"
 	@echo "- node_modules: $(shell [ -d 'config-service/node_modules' ] && echo '✅ Installed' || echo '❌ Not installed')"
+
+# ============================================
+# Kafka Commands
+# ============================================
+
+# Start Kafka services
+kafka-up:
+	@echo "🚀 Starting Kafka services..."
+	docker-compose up -d zookeeper kafka kafka-ui
+	@echo "⏳ Waiting for Kafka to be ready..."
+	@sleep 10
+	@echo "✅ Kafka services started"
+	@echo ""
+	@echo "Services running:"
+	@echo "  - Zookeeper: localhost:2181"
+	@echo "  - Kafka: localhost:9093 (external), kafka:9092 (internal)"
+	@echo "  - Kafka UI: http://localhost:8090"
+	@echo ""
+	@echo "Topics will auto-create when first used"
+
+# Stop Kafka services
+kafka-down:
+	@echo "Stopping Kafka services..."
+	docker-compose stop kafka kafka-ui zookeeper
+	@echo "✅ Kafka services stopped"
+
+# Open Kafka UI in browser
+kafka-ui:
+	@echo "Opening Kafka UI..."
+	@echo "Kafka UI: http://localhost:8090"
+	@which start > /dev/null && start http://localhost:8090 || (which open > /dev/null && open http://localhost:8090 || echo "Visit http://localhost:8090 in your browser")
+
+# Consume messages from config-events topic
+kafka-consume:
+	@echo "📨 Consuming messages from config-events topic..."
+	@echo "Press Ctrl+C to stop"
+	@echo ""
+	docker exec -it kafka kafka-console-consumer \
+		--bootstrap-server localhost:9092 \
+		--topic config-events \
+		--from-beginning \
+		--property print.key=true \
+		--property key.separator=" : "
+
+# Produce a test message to config-events topic
+kafka-produce:
+	@echo "📤 Sending test message to config-events topic..."
+	@echo ""
+	@echo '{"eventId":"test-123","eventType":"config.created","timestamp":"'$$(date -u +"%Y-%m-%dT%H:%M:%SZ")'","version":"1.0","source":"manual-test","data":{"id":999,"key":"test_key","value":"test_value","description":"Test configuration"}}' | \
+	docker exec -i kafka kafka-console-producer \
+		--bootstrap-server localhost:9092 \
+		--topic config-events \
+		--property "parse.key=true" \
+		--property "key.separator=:" \
+		--property "key=test_key"
+	@echo ""
+	@echo "✅ Test message sent!"
+	@echo "View it in Kafka UI: http://localhost:8090"
+
+# Check Kafka broker health
+kafka-status:
+	@echo "Kafka Broker Status"
+	@echo "==================="
+	@echo ""
+	@docker exec kafka kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1 && \
+		echo "✅ Kafka broker is healthy" || \
+		echo "❌ Kafka broker is not responding"
+	@echo ""
+	@echo "Topics:"
+	@docker exec kafka kafka-topics --bootstrap-server localhost:9092 --list 2>/dev/null || echo "No topics found"
+	@echo ""
+	@echo "Consumer Groups:"
+	@docker exec kafka kafka-consumer-groups --bootstrap-server localhost:9092 --list 2>/dev/null || echo "No consumer groups found"
+
+# View Kafka logs
+kafka-logs:
+	@echo "Showing Kafka logs (Ctrl+C to exit)..."
+	docker-compose logs -f kafka
+
+# Open Kafka container shell
+kafka-shell:
+	@echo "Opening Kafka container shell..."
+	docker exec -it kafka bash
+
+# List all Kafka topics with details
+kafka-list-topics:
+	@echo "Kafka Topics"
+	@echo "============"
+	@docker exec kafka kafka-topics \
+		--bootstrap-server localhost:9092 \
+		--list
+	@echo ""
+	@echo "Topic Details:"
+	@docker exec kafka kafka-topics \
+		--bootstrap-server localhost:9092 \
+		--describe
+
+# Delete a Kafka topic (use with caution)
+kafka-delete-topic:
+	@echo "⚠️  Delete Kafka Topic"
+	@echo "====================="
+	@read -p "Enter topic name to delete: " topic; \
+	docker exec kafka kafka-topics \
+		--bootstrap-server localhost:9092 \
+		--delete \
+		--topic $$topic
+
+# Reset Kafka (delete all data)
+kafka-reset:
+	@echo "⚠️  WARNING: This will delete all Kafka data!"
+	@read -p "Are you sure? (yes/no): " confirm; \
+	if [ "$$confirm" = "yes" ]; then \
+		echo "Stopping Kafka services..."; \
+		docker-compose down kafka kafka-ui zookeeper; \
+		echo "Removing Kafka volumes..."; \
+		docker volume rm module1_kafka_data module1_zookeeper_data module1_zookeeper_logs 2>/dev/null || true; \
+		echo "✅ Kafka reset complete"; \
+		echo "Run 'make kafka-up' to restart"; \
+	else \
+		echo "Cancelled"; \
+	fi
