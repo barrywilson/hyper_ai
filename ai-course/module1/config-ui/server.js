@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const kafka = require('./kafka');
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 const API_URLS = {
@@ -66,8 +68,38 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`UI server running on http://localhost:${PORT}`);
-  console.log('Dynamic resolver loading enabled');
+// Startup function with Kafka integration
+async function start() {
+  try {
+    // Start Kafka first
+    await kafka.startKafka();
+    
+    // Then start Express server
+    app.listen(PORT, () => {
+      console.log(`\n🚀 Config UI Server Started`);
+      console.log(`   HTTP: http://localhost:${PORT}`);
+      console.log(`   Kafka: ${kafka.isReady() ? '✅ Connected' : '❌ Disconnected'}`);
+      console.log(`   Resolver: ✅ Dynamic loading enabled\n`);
+    });
+    
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('\n📛 SIGTERM received, shutting down gracefully...');
+  await kafka.shutdown();
+  process.exit(0);
 });
+
+process.on('SIGINT', async () => {
+  console.log('\n📛 SIGINT received, shutting down gracefully...');
+  await kafka.shutdown();
+  process.exit(0);
+});
+
+// Start the server
+start();
