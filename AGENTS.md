@@ -13,6 +13,7 @@ This file directs the AI assistant to load the following context documents at th
 3. **[memory/IMPLEMENTATION.md](./memory/IMPLEMENTATION.md)** — Implementation details, coding conventions, and best practices
 4. **[memory/CLIENT_LIBRARY.md](./memory/CLIENT_LIBRARY.md)** — Client library design, API, and usage patterns
 5. **[memory/TESTING.md](./memory/TESTING.md)** — Testing philosophy, integration over unit, ephemeral containers
+6. **[memory/KAFKA.md](./memory/KAFKA.md)** — Kafka integration architecture, event-driven patterns, and streaming designs
 
 ## Quick Context
 
