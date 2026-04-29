@@ -26,14 +26,13 @@ help:
 	@echo "  status       Show current service status"
 	@echo ""
 	@echo "Kafka Targets:"
-	@echo "  kafka-up     Start Kafka + Zookeeper + Kafka UI"
-	@echo "  kafka-down   Stop Kafka services"
-	@echo "  kafka-ui     Open Kafka UI in browser"
+	@echo "  kafka-up     Start Kafka (KRaft mode)"
+	@echo "  kafka-down   Stop Kafka"
 	@echo "  kafka-consume Tail config-events topic"
-	@echo "  kafka-produce Send test message to config-events"
-	@echo "  kafka-status Check Kafka broker health"
-	@echo "  kafka-logs   View Kafka container logs"
-	@echo "  kafka-shell  Open Kafka container shell"
+	@echo "  kafka-produce Send test message"
+	@echo "  kafka-status Check Kafka health"
+	@echo "  kafka-logs   View Kafka logs"
+	@echo "  kafka-shell  Open Kafka shell"
 	@echo ""
 
 # Install dependencies
@@ -196,32 +195,22 @@ diagnose:
 # Kafka Commands
 # ============================================
 
-# Start Kafka services
+# Start Kafka service
 kafka-up:
-	@echo "🚀 Starting Kafka services..."
-	docker-compose up -d zookeeper kafka kafka-ui
+	@echo "🚀 Starting Kafka (KRaft mode)..."
+	docker-compose up -d kafka
 	@echo "⏳ Waiting for Kafka to be ready..."
-	@sleep 10
-	@echo "✅ Kafka services started"
+	@sleep 5
+	@echo "✅ Kafka started"
 	@echo ""
-	@echo "Services running:"
-	@echo "  - Zookeeper: localhost:2181"
-	@echo "  - Kafka: localhost:9093 (external), kafka:9092 (internal)"
-	@echo "  - Kafka UI: http://localhost:8090"
-	@echo ""
-	@echo "Topics will auto-create when first used"
+	@echo "Kafka: localhost:9092"
+	@echo "Topics auto-create on first use"
 
-# Stop Kafka services
+# Stop Kafka service
 kafka-down:
-	@echo "Stopping Kafka services..."
-	docker-compose stop kafka kafka-ui zookeeper
-	@echo "✅ Kafka services stopped"
-
-# Open Kafka UI in browser
-kafka-ui:
-	@echo "Opening Kafka UI..."
-	@echo "Kafka UI: http://localhost:8090"
-	@which start > /dev/null && start http://localhost:8090 || (which open > /dev/null && open http://localhost:8090 || echo "Visit http://localhost:8090 in your browser")
+	@echo "Stopping Kafka..."
+	docker-compose stop kafka
+	@echo "✅ Kafka stopped"
 
 # Consume messages from config-events topic
 kafka-consume:
@@ -248,7 +237,7 @@ kafka-produce:
 		--property "key=test_key"
 	@echo ""
 	@echo "✅ Test message sent!"
-	@echo "View it in Kafka UI: http://localhost:8090"
+	@echo "Run 'make kafka-consume' to view it"
 
 # Check Kafka broker health
 kafka-status:
@@ -303,10 +292,8 @@ kafka-reset:
 	@echo "⚠️  WARNING: This will delete all Kafka data!"
 	@read -p "Are you sure? (yes/no): " confirm; \
 	if [ "$$confirm" = "yes" ]; then \
-		echo "Stopping Kafka services..."; \
-		docker-compose down kafka kafka-ui zookeeper; \
-		echo "Removing Kafka volumes..."; \
-		docker volume rm module1_kafka_data module1_zookeeper_data module1_zookeeper_logs 2>/dev/null || true; \
+		echo "Stopping Kafka..."; \
+		docker-compose down kafka; \
 		echo "✅ Kafka reset complete"; \
 		echo "Run 'make kafka-up' to restart"; \
 	else \

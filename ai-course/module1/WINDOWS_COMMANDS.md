@@ -17,8 +17,8 @@ docker-compose up -d
 
 ### Start Specific Services
 ```cmd
-# Start only Kafka stack
-docker-compose up -d zookeeper kafka kafka-ui
+# Start only Kafka
+docker-compose up -d kafka
 
 # Start only database
 docker-compose up -d db
@@ -35,8 +35,8 @@ docker-compose up -d config-ui
 # Stop all services
 docker-compose down
 
-# Stop specific services
-docker-compose stop kafka kafka-ui zookeeper
+# Stop Kafka
+docker-compose stop kafka
 ```
 
 ### Check Status
@@ -45,13 +45,12 @@ docker-compose stop kafka kafka-ui zookeeper
 docker ps
 
 # Check logs
-docker logs kafka-ui
 docker logs kafka
 docker logs config_service_dev
 docker logs config_ui_dev
 
 # Follow logs (Ctrl+C to exit)
-docker logs -f kafka-ui
+docker logs -f kafka
 ```
 
 ### Clean Up
@@ -118,7 +117,7 @@ npm test
 
 ## Access Points
 
-- **Kafka UI**: http://localhost:8090
+- **Kafka**: localhost:9092
 - **Frontend UI**: http://localhost:8080
 - **Backend API**: http://localhost:3000
 - **MySQL**: localhost:3306
@@ -127,8 +126,8 @@ npm test
 
 ### Port Already in Use
 ```cmd
-# Find process using port 8090
-netstat -ano | findstr :8090
+# Find process using port 9092
+netstat -ano | findstr :9092
 
 # Kill process (replace PID with actual process ID)
 taskkill /PID <PID> /F

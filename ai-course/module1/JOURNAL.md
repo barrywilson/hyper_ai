@@ -355,3 +355,111 @@ Makefiles and shell scripts are valuable tools for **production container orches
 - **Know when to use which**: Don't add automation until complexity justifies it
 
 **Simple > Complex. Always.**
+
+---
+
+## Reflections: Kafka Setup Bloat Removal
+
+### Issue: Over-Engineered Kafka Setup for Training
+**Problem:** Kafka setup included unnecessary complexity for a simple training environment:
+- ZooKeeper (old Kafka architecture)
+- Kafka UI (extra container, extra port)
+- Multiple topics created upfront for non-existent features
+- Complex configuration for production scenarios
+
+**User Feedback:** "My kafka setup is bloatware again, too many things running just for a simple training setup."
+
+**What Was Running:**
+1. ZooKeeper container (port 2181)
+2. Kafka container (ports 9092, 9093)
+3. Kafka UI container (port 8090)
+4. kafka-init.sh script creating 4 topics
+5. Volumes for zookeeper_data, zookeeper_logs, kafka_data
+
+**What Was Actually Needed:**
+1. Kafka container (port 9092) in KRaft mode
+2. Auto-create topics on first use
+3. That's it.
+
+**Actions Taken:**
+1. ✅ Replaced old Kafka (with ZooKeeper) with modern KRaft mode
+2. ✅ Removed ZooKeeper container entirely
+3. ✅ Removed Kafka UI container
+4. ✅ Removed kafka-init.sh script (already deleted earlier)
+5. ✅ Simplified docker-compose.yml (3 containers → 1 container)
+6. ✅ Cleaned up volumes (removed zookeeper_data, zookeeper_logs, kafka_data)
+7. ✅ Updated all Makefile commands
+8. ✅ Updated WINDOWS_COMMANDS.md
+9. ✅ Created KAFKA_SIMPLE.md guide
+
+**New Setup:**
+```yaml
+kafka:
+  image: apache/kafka:latest
+  ports:
+    - "9092:9092"
+  environment:
+    # KRaft mode (no ZooKeeper)
+    KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+```
+
+One container. One port. Auto-create topics. Done.
+
+**Key Insight - Context Matters:**
+The user's feedback highlighted an important distinction:
+
+**For Production/Containers:**
+- ZooKeeper/KRaft clusters make sense
+- Multiple brokers for high availability
+- Replication, security, monitoring
+- Schema Registry, Kafka Connect
+- Kafka UI for operations
+
+**For Simple Training:**
+- 1 Kafka container
+- 1 topic
+- 1 Node consumer/producer
+- Learn the fundamentals first
+
+**The Pattern (Again):**
+AI defaults to "production-ready" = "comprehensive" = bloat for learning scenarios.
+
+**Mental Model:**
+```
+Node.js Producer/Consumer → Kafka (1 container) → Topics
+```
+
+That's enough to learn everything important about Kafka.
+
+**Docker Networking Gotcha:**
+- Node outside container: `brokers: ['localhost:9092']`
+- Node inside container: `brokers: ['kafka:9092']`
+
+This is the ONE thing that will bite you. Document it clearly.
+
+**What's NOT Needed for Learning:**
+❌ ZooKeeper (old Kafka only)
+❌ Multiple brokers (cluster)
+❌ Replication configs
+❌ Schema Registry
+❌ Kafka Connect
+❌ Security (SASL/SSL)
+❌ Kubernetes
+❌ Kafka UI
+
+Add these later when complexity is justified.
+
+**Lesson Reinforced (Third Time):**
+1. **Question the default** - "Production-ready" isn't always appropriate
+2. **Match complexity to context** - Training ≠ Production
+3. **Start minimal, expand later** - Don't future-proof learning environments
+4. **One thing at a time** - Learn Kafka fundamentals before adding operational complexity
+
+**Cost Saved:**
+- Fewer containers = faster startup
+- Less memory usage
+- Simpler mental model
+- Easier troubleshooting
+- No cognitive overhead from unused features
+
+**Simple > Complex. Always. (Especially for learning.)**

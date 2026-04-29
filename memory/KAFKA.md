@@ -624,115 +624,11 @@ async function publishConfigEvent(eventType, data) {
 }
 ```
 
-## Deployment Architecture
+## Deployment Notes
 
-### Docker Compose Setup
+**For Training**: See `ai-course/module1/KAFKA_SIMPLE.md` for minimal Docker setup (1 Kafka container, KRaft mode).
 
-```yaml
-version: '3.8'
-
-services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
-
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    depends_on:
-      - kafka
-    ports:
-      - "8090:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-
-  config-service:
-    build: ./config-service
-    depends_on:
-      - mysql
-      - kafka
-    environment:
-      KAFKA_BROKERS: kafka:9092
-      DB_HOST: mysql
-    ports:
-      - "3000:3000"
-
-  cache-updater:
-    build: ./consumers/cache-updater
-    depends_on:
-      - kafka
-      - redis
-    environment:
-      KAFKA_BROKERS: kafka:9092
-      REDIS_HOST: redis
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-```
-
-### Kubernetes Deployment
-
-```yaml
-# kafka-deployment.yaml
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: kafka
-spec:
-  serviceName: kafka
-  replicas: 3
-  selector:
-    matchLabels:
-      app: kafka
-  template:
-    metadata:
-      labels:
-        app: kafka
-    spec:
-      containers:
-      - name: kafka
-        image: confluentinc/cp-kafka:7.5.0
-        ports:
-        - containerPort: 9092
-        env:
-        - name: KAFKA_BROKER_ID
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        volumeMounts:
-        - name: kafka-data
-          mountPath: /var/lib/kafka/data
-  volumeClaimTemplates:
-  - metadata:
-      name: kafka-data
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 10Gi
-```
+**For Production**: Use managed Kafka services (Confluent Cloud, AWS MSK, Azure Event Hubs) or Kubernetes operators (Strimzi).
 
 ## Migration Strategy
 
