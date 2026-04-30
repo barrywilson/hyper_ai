@@ -1,0 +1,12 @@
+ @view-transition {
+          navigation: auto;
+        }
+
+html {
+    background: #111;
+}
+
+body {
+    margin: 0;
+    background: #111;
+}

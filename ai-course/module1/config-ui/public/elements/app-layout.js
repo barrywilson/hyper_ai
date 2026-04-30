@@ -28,28 +28,7 @@ class AppLayout extends HTMLElement {
       </div>
     `;
     
-    // Load required scripts if not already loaded
-    // this.loadScripts();
-
-     const transitions  = `
-      <style>
-        @view-transition {
-          navigation: auto;
-        }
-
-        html {
-          background: #111;
-        }
-
-        body {
-          margin: 0;
-          background: #111;
-        }
-      </style>`;
-
-      const style = document.createElement('style');
-        style.textContent = transitions;
-        document.head.appendChild(style);
+ 
        const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = "style.css";
