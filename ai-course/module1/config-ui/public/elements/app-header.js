@@ -25,7 +25,7 @@ customElements.define('app-header', class extends HTMLElement {
     const titleContent = this.getAttribute('heading') || '';
     const subtitleContent = this.getAttribute('subheading') || '';
     // Render the header structure
-    this.innerHTML = `
+    this.outerHTML = `
       <header>
       <div>              
             <h1>

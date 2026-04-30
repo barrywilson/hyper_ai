@@ -3,25 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Configuration Service</title>
-    <style>
-        @view-transition {
-            navigation: auto;
-        }
-
-        html {
-            background: #111; /* match your app background */
-        }
-
-        body {
-            margin: 0;
-            background: #111;
-        }
-    </style>
-    <link rel="stylesheet" href="style.css">
+    <title>Admin Dashboard - Configuration Service</title>   
 </head>
 <body>
-    <div class="container">
+    <app-layout footer='Configuration Service Admin Dashboard'>
         <app-header heading="⚙️ Admin Dashboard" subheading="Configuration Management">           
             <div slot="actions">
                 <a href="index.html">← Back to App</a>
@@ -62,11 +47,9 @@
                 <config-table id="config-table"></config-table>
             </div>
         </main>
+       
 
-        <footer>
-            <p>Configuration Service | Admin Dashboard</p>
-        </footer>
-    </div>
+    </app-layout>
 
     <!-- Edit/Add Modal -->
     <div id="configModal" class="modal">
@@ -105,6 +88,7 @@
     <script src="elements/app-message.js"></script>
     <script src="elements/app-loading.js"></script>
     <script src="elements/config-table.js"></script>
+    <script src="elements/app-layout.js"></script>
     <script>
         // Initialize API with resolver pattern
         const api = createApi({
