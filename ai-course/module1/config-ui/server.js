@@ -38,25 +38,25 @@ app.post('/api/resolve', async (req, res) => {
 
       // Handle the result
       if (result.error) {
-        res.status(result.status).json({ error: result.error });
+        return res.status(result.status).json({ error: result.error });
       }
 
       if (result.status === 204) {
-        res.status(204).send();
+        return res.status(204).send();
       }
 
-      res.status(result.status).json(result.data);
+      return res.status(result.status).json(result.data);
 
     } catch (error) {
       // Handle resolver not found
       console.error('Resolver error:', error);
       if (error.code === 'MODULE_NOT_FOUND') {
-        res.status(400).json({
+        return res.status(400).json({
           error: `Unknown namespace: ${namespace} or version: ${version}`
         });
       }
 
-      res.status(400).json({
+      return res.status(400).json({
         error
       });
 
