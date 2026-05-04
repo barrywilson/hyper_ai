@@ -19,6 +19,9 @@
         </app-header>
 
         <main>
+            <!-- Dashboard Stats -->
+            <dashboard-stats id="dashboardStats"></dashboard-stats>
+
             <!-- Configurations Table -->
             <section class="table-section">
                 <h2>Configurations (Read-Only)</h2>
@@ -33,6 +36,7 @@
 
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>
+    <script src="elements/dashboard-stats.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
@@ -65,6 +69,7 @@
         async function loadConfigurations() {
 
             const configTable = document.getElementById('config-table');
+            const dashboardStats = document.getElementById('dashboardStats');
             const appLayout = document.getElementById('appLayout');
             try {
 
@@ -75,6 +80,9 @@
 
                 if (configTable) {
                     configTable.data = configurations;
+                }
+                if (dashboardStats) {
+                    dashboardStats.data = configurations;
                 }
 
             } catch (error) {

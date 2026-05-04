@@ -22,9 +22,7 @@
 
             <!-- Search & Actions -->
             <div class="dashboard-header">
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search by key name...">
-                </div>
+                <config-search id="configSearch"></config-search>
                 <button class="btn btn-primary" id="addConfigBtn">
                     ➕ New Configuration
                 </button>
@@ -43,6 +41,7 @@
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>
     <script src="elements/dashboard-stats.js"></script>
+    <script src="elements/config-search.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/config-modal.js"></script>
     <script src="elements/app-layout.js"></script>
@@ -61,7 +60,7 @@
         const configTable = document.getElementById('config-table');
         const dashboardStats = document.getElementById('dashboardStats');
         const appLayout = document.getElementById('appLayout');
-        const searchInput = document.getElementById('searchInput');
+        const configSearch = document.getElementById('configSearch');
         const addConfigBtn = document.getElementById('addConfigBtn');
 
         // Initialize
@@ -74,7 +73,7 @@
 
         function setupEventListeners() {
             addConfigBtn.addEventListener('click', () => configModalElement.openAdd());
-            searchInput.addEventListener('input', filterConfigs);
+            configSearch.addEventListener('search', filterConfigs);
 
             // Listen for config-action events
             document.addEventListener('config-action', (e) => {
@@ -108,8 +107,10 @@
             }
         }
 
-        function filterConfigs() {
-            const query = searchInput.value.toLowerCase();
+        function filterConfigs(e) {
+            const query = e && e.detail && e.detail.query !== undefined 
+                ? e.detail.query 
+                : configSearch.value.toLowerCase();
             const filtered = allConfigs.filter(config =>
                 config.key.toLowerCase().includes(query)
             );
