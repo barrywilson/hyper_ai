@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Configuration Service</title>   
+    <title>Admin Dashboard - Configuration Service</title>
     <link rel="stylesheet" href="transitions.css">
 </head>
+
 <body>
     <app-layout footer='Configuration Service Admin Dashboard' id="appLayout">
-        <app-header heading="⚙️ Admin Dashboard" subheading="Configuration Management">           
+        <app-header heading="⚙️ Admin Dashboard" subheading="Configuration Management">
             <div slot="actions">
                 <a href="index.html">← Back to App</a>
             </div>
@@ -37,14 +39,10 @@
                 </button>
             </div>
 
-            
+            <config-table id="config-table"></config-table>
 
-            <!-- Configurations Table -->
-            <div class="table-wrapper">
-                <config-table id="config-table"></config-table>
-            </div>
         </main>
-       
+
 
     </app-layout>
 
@@ -52,7 +50,7 @@
     <config-modal id="configModalElement"></config-modal>
 
     <script src="api-client.js"></script>
-    <script src="elements/app-header.js"></script>    
+    <script src="elements/app-header.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/config-modal.js"></script>
     <script src="elements/app-layout.js"></script>
@@ -74,17 +72,17 @@
         const addConfigBtn = document.getElementById('addConfigBtn');
 
         // Initialize
-                // Initialize
+        // Initialize
         document.addEventListener('layout-loaded', () => {
             loadConfigurations();
             setupEventListeners();
         });
-       
+
 
         function setupEventListeners() {
             addConfigBtn.addEventListener('click', () => configModalElement.openAdd());
             searchInput.addEventListener('input', filterConfigs);
-            
+
             // Listen for config-action events
             document.addEventListener('config-action', (e) => {
                 const { action, id } = e.detail;
@@ -102,17 +100,17 @@
         async function loadConfigurations() {
             appLayout.ShowMessage('Loading configurations...');
             appLayout.ShowProgress(true);
-            
+
             try {
                 allConfigs = await api('list');
                 configTable.data = allConfigs;
                 document.getElementById('totalConfigs').textContent = allConfigs.length;
-            
+
                 if (allConfigs.length > 0) {
                     const latest = new Date(allConfigs[0].updated_at);
                     document.getElementById('lastUpdated').textContent = latest.toLocaleDateString();
                 }
-                
+
             } catch (error) {
                 console.error('Error loading configurations:', error);
                 appLayout.ShowMessage('Failed to load configurations: ' + error.message);
@@ -124,7 +122,7 @@
 
         function filterConfigs() {
             const query = searchInput.value.toLowerCase();
-            const filtered = allConfigs.filter(config => 
+            const filtered = allConfigs.filter(config =>
                 config.key.toLowerCase().includes(query)
             );
             configTable.data = filtered;
@@ -132,12 +130,12 @@
 
         async function handleFormSubmit(e) {
             const { id, key, value, description } = e.detail;
-            
+
             if (!key || !value) {
                 appLayout.ShowMessage('Key name and value are required', 'error');
                 return;
             }
-            
+
             try {
                 if (id) {
                     await api('update', {
@@ -154,7 +152,7 @@
                     });
                     appLayout.ShowMessage('Configuration created successfully!', 'success');
                 }
-                
+
                 configModalElement.close();
                 loadConfigurations();
             } catch (error) {
@@ -164,20 +162,21 @@
 
         async function deleteConfig(id) {
             if (!confirm('Are you sure you want to delete this configuration?')) return;
-            
+
             try {
                 await api('delete', { id: parseInt(id) });
-                appLayout.ShowMessage('Configuration deleted successfully!', 'success');                
+                appLayout.ShowMessage('Configuration deleted successfully!', 'success');
                 loadConfigurations();
             } catch (error) {
                 appLayout.ShowMessage('Error: ' + error.message, 'error');
             }
         }
 
-      
 
-      
-        
+
+
+
     </script>
 </body>
+
 </html>

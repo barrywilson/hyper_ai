@@ -10,9 +10,9 @@ const escapeHtml = (text) => {
 };
 
 
-const renderTable = (element, configurations) => {  
+const renderTable = (element, configurations) => {
   const isReadonly = element.hasAttribute('readonly');
-  
+
   const rows = configurations.map(config => `
     <tr>
       <td>${config.id}</td>
@@ -30,8 +30,9 @@ const renderTable = (element, configurations) => {
       ` : ''}
     </tr>
   `).join('');
-  
+
   element.innerHTML = `
+  <div class="table-wrapper">
     <table>
       <thead>
         <tr>
@@ -45,18 +46,19 @@ const renderTable = (element, configurations) => {
       </thead>
       <tbody>${rows}</tbody>
     </table>
+  </div>
   `;
-  
+
   // Single event listener for all buttons (only if not readonly)
   if (!isReadonly) {
     element.querySelectorAll('button[data-action]').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        element.dispatchEvent(new CustomEvent('config-action', { 
-          detail: { 
+        element.dispatchEvent(new CustomEvent('config-action', {
+          detail: {
             action: e.target.dataset.action,
             id: parseInt(e.target.dataset.id)
           },
-          bubbles: true 
+          bubbles: true
         }));
       });
     });
@@ -67,11 +69,11 @@ const renderTable = (element, configurations) => {
 
 // Register custom element
 customElements.define('config-table', class extends HTMLElement {
-  
-  connectedCallback = function() {
+
+  connectedCallback = function () {
     this.innerHTML = `<p>Loading configurations...</p>`;
   };
-  
+
   set data(configurations) {
     this._data = configurations;
     renderTable(this, configurations);
