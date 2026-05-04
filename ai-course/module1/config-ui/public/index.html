@@ -64,7 +64,13 @@
         });
 
         // Listen for real-time SSE updates
-        document.addEventListener('config-updated', loadConfigurations);
+        document.addEventListener('config-updated', (e) => {
+            const data = e.detail;
+            const action = data.eventType?.toUpperCase() || 'UPDATED';
+            const key = data.data?.key || data.data?.params?.key || data.data?.params?.id || 'Configuration';
+            appLayout.ShowMessage(`Notice: ${key} was ${action}`, 'success');
+            loadConfigurations();
+        });
 
         /**
          * Load all configurations from API

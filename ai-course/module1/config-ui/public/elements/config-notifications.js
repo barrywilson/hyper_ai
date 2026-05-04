@@ -9,7 +9,6 @@ customElements.define('config-notifications', class extends HTMLElement {
     }
 
     connectedCallback() {
-        this.appLayout = this.closest('app-layout') || document.getElementById('appLayout');
         this.connect();
     }
 
@@ -30,14 +29,12 @@ customElements.define('config-notifications', class extends HTMLElement {
                 if (data.connected) return;
 
                 // Handle Kafka config events
-                if (data.eventType && this.appLayout && typeof this.appLayout.ShowMessage === 'function') {
+                if (data.eventType) {
                     const action = data.eventType.toUpperCase();
-                    // Fallbacks for key parsing based on expected data structure
                     const key = data.data?.key || data.data?.params?.key || data.data?.params?.id || 'Configuration';
                     
-                    this.appLayout.ShowMessage(`Notice: ${key} was ${action}`, 'success');
-                    console.log(`Notice: ${key} was ${action}`, 'success');
-                    // Dispatch an event in case the page wants to reload
+                    console.log(`Notice: ${key} was ${action}`);
+                    // Dispatch an event so the parent application can handle the UI updates
                     this.dispatchEvent(new CustomEvent('config-updated', {
                         bubbles: true,
                         composed: true,

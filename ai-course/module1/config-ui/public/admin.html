@@ -90,8 +90,14 @@
 
             configModalElement.addEventListener('save-config', saveConfig);
 
-            // Reload configurations dynamically via SSE
-            document.addEventListener('config-updated', loadConfigurations);
+            // Reload configurations dynamically via SSE and show toast
+            document.addEventListener('config-updated', (e) => {
+                const data = e.detail;
+                const action = data.eventType?.toUpperCase() || 'UPDATED';
+                const key = data.data?.key || data.data?.params?.key || data.data?.params?.id || 'Configuration';
+                appLayout.ShowMessage(`Notice: ${key} was ${action}`, 'success');
+                loadConfigurations();
+            });
         }
 
         async function loadConfigurations() {
