@@ -107,7 +107,7 @@
         // Initialize
                 // Initialize
         document.addEventListener('layout-loaded', () => {
-            loadConfigs();
+            loadConfigurations();
             setupEventListeners();
         });
        
@@ -135,7 +135,7 @@
             });
         }
 
-        async function loadConfigs() {
+        async function loadConfigurations() {
             appLayout.ShowMessage('Loading configurations...');
             appLayout.ShowProgress(true);
             
