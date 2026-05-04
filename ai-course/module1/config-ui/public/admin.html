@@ -18,16 +18,7 @@
 
         <main>
             <!-- Dashboard Stats -->
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>Total Configs</h3>
-                    <div class="value" id="totalConfigs">0</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Last Updated</h3>
-                    <div class="value" id="lastUpdated" style="font-size: 16px;">—</div>
-                </div>
-            </div>
+            <dashboard-stats id="dashboardStats"></dashboard-stats>
 
             <!-- Search & Actions -->
             <div class="dashboard-header">
@@ -51,6 +42,7 @@
 
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>
+    <script src="elements/dashboard-stats.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/config-modal.js"></script>
     <script src="elements/app-layout.js"></script>
@@ -67,6 +59,7 @@
         // DOM Elements
         const configModalElement = document.getElementById('configModalElement');
         const configTable = document.getElementById('config-table');
+        const dashboardStats = document.getElementById('dashboardStats');
         const appLayout = document.getElementById('appLayout');
         const searchInput = document.getElementById('searchInput');
         const addConfigBtn = document.getElementById('addConfigBtn');
@@ -94,7 +87,7 @@
                 }
             });
 
-            configModalElement.addEventListener('save-config', handleFormSubmit);
+            configModalElement.addEventListener('save-config', saveConfig);
         }
 
         async function loadConfigurations() {
@@ -104,12 +97,7 @@
             try {
                 allConfigs = await api('list');
                 configTable.data = allConfigs;
-                document.getElementById('totalConfigs').textContent = allConfigs.length;
-
-                if (allConfigs.length > 0) {
-                    const latest = new Date(allConfigs[0].updated_at);
-                    document.getElementById('lastUpdated').textContent = latest.toLocaleDateString();
-                }
+                dashboardStats.data = allConfigs;
 
             } catch (error) {
                 console.error('Error loading configurations:', error);
@@ -128,7 +116,7 @@
             configTable.data = filtered;
         }
 
-        async function handleFormSubmit(e) {
+        async function saveConfig(e) {
             const { id, key, value, description } = e.detail;
 
             if (!key || !value) {
