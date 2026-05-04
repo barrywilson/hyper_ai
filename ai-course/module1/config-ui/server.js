@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const kafka = require('./kafka');
 
 const app = express();
@@ -71,8 +71,8 @@ app.post('/api/resolve', async (req, res) => {
   } catch (error) {
     console.error('API proxy error:', error);
     // Return error message, not error object
-    res.status(500).json({ 
-      error: error.message || 'Failed to reach backend API' 
+    res.status(500).json({
+      error: error.message || 'Failed to reach backend API'
     });
   }
 });

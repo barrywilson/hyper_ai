@@ -5,7 +5,7 @@ async function test() {
   console.log('Publishing test event...');
   await kafka.publishEvent('CREATE', { key: 'test-key', value: 'test-value' });
   console.log('Event published! Waiting to see if consumer catches it...');
-  
+
   // Wait a few seconds for consumer to process it
   setTimeout(async () => {
     await kafka.shutdown();

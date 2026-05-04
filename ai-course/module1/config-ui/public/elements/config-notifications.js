@@ -36,7 +36,7 @@ customElements.define('config-notifications', class extends HTMLElement {
                     const key = data.data?.key || data.data?.params?.key || data.data?.params?.id || 'Configuration';
                     
                     this.appLayout.ShowMessage(`Notice: ${key} was ${action}`, 'success');
-                    
+                    console.log(`Notice: ${key} was ${action}`, 'success');
                     // Dispatch an event in case the page wants to reload
                     this.dispatchEvent(new CustomEvent('config-updated', {
                         bubbles: true,
