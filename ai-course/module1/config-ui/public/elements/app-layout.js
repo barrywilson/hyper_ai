@@ -24,21 +24,27 @@
             //get rid of tag and render children
             // Create layout structure
             // let tempInnerHTML = this.innerHTML
-            this.loading=null;
-            this.message=null;
-            this.innerHTML = `
-            <div class="container" id="${this.id}"> 
-                
-                ${this.innerHTML}
+            this.loading = null;
+            this.message = null;
 
-                <footer>
-                        <app-message id="${this.id}-message"></app-message>   
-                        <app-loading id="${this.id}-loading"></app-loading>  
-                        <p>${this.getAttribute('footer') || ''}</p>
-                </footer>
+            // Preserve existing nodes for view transitions
+            const children = Array.from(this.childNodes);
+            
+            const container = document.createElement('div');
+            container.className = 'container';
+            if (this.id) container.id = this.id;
+            
+            children.forEach(child => container.appendChild(child));
 
-            </div>
+            const footer = document.createElement('footer');
+            footer.innerHTML = `
+                <app-message id="${this.id}-message"></app-message>   
+                <app-loading id="${this.id}-loading"></app-loading>  
+                <p>${this.getAttribute('footer') || ''}</p>
             `;
+            container.appendChild(footer);
+            
+            this.appendChild(container);
             
         
             const link = document.createElement('link');
