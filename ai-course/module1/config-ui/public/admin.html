@@ -49,40 +49,12 @@
     </app-layout>
 
     <!-- Edit/Add Modal -->
-    <div id="configModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" id="closeModal">&times;</button>
-            <div class="modal-header" id="modalTitle">Add New Configuration</div>
-            
-            <form id="configForm">
-                <input type="hidden" id="configId">
-                
-                <div class="form-group">
-                    <label for="key">Key Name *</label>
-                    <input type="text" id="key" required placeholder="e.g., app_name">
-                </div>
-
-                <div class="form-group">
-                    <label for="configValue">Value *</label>
-                    <textarea id="configValue" required placeholder="Configuration value"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <input type="text" id="description" placeholder="Optional description">
-                </div>
-
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Configuration</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <config-modal id="configModalElement"></config-modal>
 
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>    
     <script src="elements/config-table.js"></script>
+    <script src="elements/config-modal.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
         // Initialize API with resolver pattern
@@ -95,14 +67,11 @@
         let allConfigs = [];
 
         // DOM Elements
-        const configModal = document.getElementById('configModal');
-        const configForm = document.getElementById('configForm');
+        const configModalElement = document.getElementById('configModalElement');
         const configTable = document.getElementById('config-table');
         const appLayout = document.getElementById('appLayout');
         const searchInput = document.getElementById('searchInput');
         const addConfigBtn = document.getElementById('addConfigBtn');
-        const closeModalBtn = document.getElementById('closeModal');
-        const cancelBtn = document.getElementById('cancelBtn');
 
         // Initialize
                 // Initialize
@@ -113,26 +82,21 @@
        
 
         function setupEventListeners() {
-            addConfigBtn.addEventListener('click', openAddModal);
-            closeModalBtn.addEventListener('click', closeModal);
-            cancelBtn.addEventListener('click', closeModal);
-            configForm.addEventListener('submit', handleFormSubmit);
+            addConfigBtn.addEventListener('click', () => configModalElement.openAdd());
             searchInput.addEventListener('input', filterConfigs);
             
             // Listen for config-action events
             document.addEventListener('config-action', (e) => {
                 const { action, id } = e.detail;
                 if (action === 'edit') {
-                    openEditModal(id);
+                    const config = allConfigs.find(c => c.id === id);
+                    if (config) configModalElement.openEdit(config);
                 } else if (action === 'delete') {
                     deleteConfig(id);
                 }
             });
-            
-            // Close modal on outside click
-            window.addEventListener('click', (e) => {
-                if (e.target === configModal) closeModal();
-            });
+
+            configModalElement.addEventListener('save-config', handleFormSubmit);
         }
 
         async function loadConfigurations() {
@@ -166,42 +130,8 @@
             configTable.data = filtered;
         }
 
-        function openAddModal() {
-            document.getElementById('modalTitle').textContent = 'Add New Configuration';
-            configForm.reset();
-            document.getElementById('configId').value = '';
-            configModal.classList.add('active');
-            document.getElementById('key').focus();
-        }
-
-        async function openEditModal(id) {
-            const config = allConfigs.find(c => c.id === id);
-            if (!config) return;
-            
-            document.getElementById('modalTitle').textContent = 'Edit Configuration';
-            document.getElementById('configId').value = config.id;
-            document.getElementById('key').value = config.key;
-            document.getElementById('key').disabled = true;
-            document.getElementById('configValue').value = config.value;
-            document.getElementById('description').value = config.description || '';
-            
-            configModal.classList.add('active');
-            document.getElementById('configValue').focus();
-        }
-
-        function closeModal() {
-            configModal.classList.remove('active');
-            configForm.reset();
-            document.getElementById('key').disabled = false;
-        }
-
         async function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const id = document.getElementById('configId').value;
-            const key = document.getElementById('key').value.trim();
-            const value = document.getElementById('configValue').value.trim();
-            const description = document.getElementById('description').value.trim();
+            const { id, key, value, description } = e.detail;
             
             if (!key || !value) {
                 appLayout.ShowMessage('Key name and value are required', 'error');
@@ -225,7 +155,7 @@
                     appLayout.ShowMessage('Configuration created successfully!', 'success');
                 }
                 
-                closeModal();
+                configModalElement.close();
                 loadConfigurations();
             } catch (error) {
                 appLayout.ShowMessage('Error: ' + error.message, 'error');
