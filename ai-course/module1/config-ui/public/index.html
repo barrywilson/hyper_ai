@@ -1,39 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuration Service</title>
     <link rel="stylesheet" href="transitions.css">
-</head>
-<body>    
-    
-        <app-layout footer='Configuration Mainboard' id="appLayout">
-            <app-header heading="Configuration Service" subheading="Manage your application configurations">         
-                <div slot="actions">
-                    <a href="admin.html">⚙️ Admin Dashboard</a>
-                </div>
-            </app-header>
 
-            <main>
-                <!-- Configurations Table -->
+</head>
+
+<body>
+
+    <app-layout footer='Configuration Mainboard' id="appLayout">
+        <app-header heading="Configuration Service" subheading="Manage your application configurations">
+            <div slot="actions">
+                <a href="admin.html">⚙️ Admin Dashboard</a>
+            </div>
+        </app-header>
+
+        <main>
+            <!-- Configurations Table -->
             <section class="table-section">
                 <h2>Configurations (Read-Only)</h2>
-                <app-message id="message"></app-message>        
+                <app-message id="message"></app-message>
                 <div class="table-wrapper">
                     <config-table id="config-table" readonly></config-table>
                 </div>
             </section>
-            </main>
-        </app-layout>       
+        </main>
+    </app-layout>
 
-        
+
     </div>
 
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>
-    <script src="elements/app-message.js"></script>
-    <script src="elements/app-loading.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
@@ -53,11 +54,10 @@
 
         // DOM Elements
 
-        const configTable = document.getElementById('config-table');
-        const appLayout = document.getElementById('appLayout');
+
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {    
+        document.addEventListener('layout-loaded', () => {
             loadConfigurations();
         });
 
@@ -65,25 +65,29 @@
          * Load all configurations from API
          */
         async function loadConfigurations() {
+
+            const configTable = document.getElementById('config-table');
+            const appLayout = document.getElementById('appLayout');
             try {
-                                
+
                 appLayout.ShowMessage('Loading configurations...');
                 appLayout.ShowProgress(true);
-             
+
                 const configurations = await configApi('list');
-                
+
                 if (configTable) {
                     configTable.data = configurations;
                 }
-                
+
             } catch (error) {
                 console.error('Error loading configurations:', error);
                 appLayout.ShowMessage('Failed to load configurations: ' + error.message);
-            } finally {            
+            } finally {
                 appLayout.ShowProgress(false);
                 appLayout.ShowMessage('');
             }
         }
     </script>
 </body>
+
 </html>

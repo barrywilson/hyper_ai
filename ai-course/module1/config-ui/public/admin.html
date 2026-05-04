@@ -81,9 +81,7 @@
     </div>
 
     <script src="api-client.js"></script>
-    <script src="elements/app-header.js"></script>
-    <script src="elements/app-message.js"></script>
-    <script src="elements/app-loading.js"></script>
+    <script src="elements/app-header.js"></script>    
     <script src="elements/config-table.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
@@ -107,10 +105,12 @@
         const cancelBtn = document.getElementById('cancelBtn');
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+                // Initialize
+        document.addEventListener('layout-loaded', () => {
             loadConfigs();
             setupEventListeners();
         });
+       
 
         function setupEventListeners() {
             addConfigBtn.addEventListener('click', openAddModal);
