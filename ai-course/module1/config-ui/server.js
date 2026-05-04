@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 // const kafka = require('./kafka');
 
 const app = express();
@@ -16,16 +17,16 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/api/resolve', async (req, res) => {
   try {
     console.log('Received API resolver request:', req.body);
-    const fetch = (await import('node-fetch')).default;
+
     const { namespace, version, action, params } = req.body;
     console.log(`Received resolver request: namespace=${namespace}, version=${version}, action=${action}`);
     // // Validate required fields
     if (!namespace || !version || !action) {
-      return res.status(400).json({ 
-        error: 'Missing required fields: namespace, version, action' 
+      return res.status(400).json({
+        error: 'Missing required fields: namespace, version, action'
       });
     }
-    
+
     // // Dynamically load resolver based on namespace and version
     try {
       const resolverPath = `./resolvers/${namespace}.${version}`;
@@ -34,28 +35,33 @@ app.post('/api/resolve', async (req, res) => {
       // console.log(resolverPath, resolvedUrl);
       // Execute the resolver
       const result = await resolver.resolve(fetch, resolvedUrl, { action, params });
-      
+
       // Handle the result
       if (result.error) {
         res.status(result.status).json({ error: result.error });
       }
-      
+
       if (result.status === 204) {
         res.status(204).send();
       }
-      
+
       res.status(result.status).json(result.data);
-      
+
     } catch (error) {
       // Handle resolver not found
+      console.error('Resolver error:', error);
       if (error.code === 'MODULE_NOT_FOUND') {
-        res.status(400).json({ 
-          error: `Unknown namespace: ${namespace} or version: ${version}` 
+        res.status(400).json({
+          error: `Unknown namespace: ${namespace} or version: ${version}`
         });
       }
-      throw error;
+
+      res.status(400).json({
+        error
+      });
+
     }
-    
+
   } catch (error) {
     console.error('API proxy error:', error);
     res.status(500).json({ error: 'Failed to reach backend API' });
@@ -75,7 +81,7 @@ async function start() {
   try {
     // Start Kafka first
     // await kafka.startKafka();
-    
+
     // Then start Express server
     app.listen(PORT, () => {
       console.log(`\n🚀 Config UI Server Started`);
@@ -83,7 +89,7 @@ async function start() {
       // console.log(`   Kafka: ${kafka.isReady() ? '✅ Connected' : '❌ Disconnected'}`);
       console.log(`   Resolver: ✅ Dynamic loading enabled\n`);
     });
-    
+
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

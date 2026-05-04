@@ -226,7 +226,7 @@
                 }
                 
                 closeModal();
-                loadConfigs();
+                loadConfigurations();
             } catch (error) {
                 appLayout.ShowMessage('Error: ' + error.message, 'error');
             }
@@ -238,7 +238,7 @@
             try {
                 await api('delete', { id: parseInt(id) });
                 appLayout.ShowMessage('Configuration deleted successfully!', 'success');                
-                loadConfigs();
+                loadConfigurations();
             } catch (error) {
                 appLayout.ShowMessage('Error: ' + error.message, 'error');
             }
