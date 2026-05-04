@@ -37,6 +37,7 @@
 
     <!-- Edit/Add Modal -->
     <config-modal id="configModalElement"></config-modal>
+    <config-notifications></config-notifications>
 
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>
@@ -44,6 +45,7 @@
     <script src="elements/config-search.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/config-modal.js"></script>
+    <script src="elements/config-notifications.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
         // Initialize API with resolver pattern
@@ -87,6 +89,9 @@
             });
 
             configModalElement.addEventListener('save-config', saveConfig);
+
+            // Reload configurations dynamically via SSE
+            document.addEventListener('config-updated', loadConfigurations);
         }
 
         async function loadConfigurations() {

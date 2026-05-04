@@ -1,8 +1,15 @@
 const { Kafka } = require('kafkajs');
+const EventEmitter = require('events');
 
+class KafkaEmitter extends EventEmitter {}
+const kafkaEvents = new KafkaEmitter();
 const kafka = new Kafka({
   clientId: 'config-ui',
   brokers: [process.env.KAFKA_BROKERS || 'localhost:9092'],
+  retry: {
+    initialRetryTime: 300,
+    retries: 5 // Stop retrying after a few attempts so it doesn't hang forever
+  }
 });
 
 const producer = kafka.producer();
@@ -10,23 +17,66 @@ const consumer = kafka.consumer({ groupId: 'config-ui-group' });
 
 let kafkaReady = false;
 
-async function startKafka() {
+async function createTopicIfNeeded() {
+  const admin = kafka.admin();
+  
   try {
-    console.log('🔌 Connecting to Kafka...');
+    await admin.connect();
     
-    // Connect producer and consumer
-    await producer.connect();
-    await consumer.connect();
+    // Check if topic exists
+    const topics = await admin.listTopics();
+    
+    if (!topics.includes('config-events')) {
+      console.log('📝 Creating config-events topic...');
+      await admin.createTopics({
+        topics: [{
+          topic: 'config-events',
+          numPartitions: 3,
+          replicationFactor: 1
+        }]
+      });
+      console.log('✅ Topic created');
+    } else {
+      console.log('✅ Topic config-events already exists');
+    }
+    
+  } finally {
+    await admin.disconnect();
+  }
+}
+
+async function startKafka() {
+  const KAFKA_TIMEOUT = 15000; // 15 second timeout
+  
+  try {
+    console.log('🔌 Connecting to Kafka at:', process.env.KAFKA_BROKERS || 'localhost:9092');
+    
+    // Wrap connection in timeout
+    await Promise.race([
+      (async () => {
+        // Connect producer and consumer
+        await producer.connect();
+        console.log('  ✓ Producer connected');
+        
+        await consumer.connect();
+        console.log('  ✓ Consumer connected');
+        
+        // Create topic if it doesn't exist
+        await createTopicIfNeeded();
+        
+        // Subscribe to config-events topic
+        await consumer.subscribe({
+          topic: 'config-events',
+          fromBeginning: false,
+        });
+        console.log('  ✓ Subscribed to config-events topic');
+      })(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Kafka connection timeout after 15s')), KAFKA_TIMEOUT)
+      )
+    ]);
     
     console.log('✅ Kafka connected');
-    
-    // Subscribe to config-events topic
-    await consumer.subscribe({
-      topic: 'test',
-      fromBeginning: false,
-    });
-    
-    console.log('📡 Subscribed to test topic');
     
     // Start consuming messages
     await consumer.run({
@@ -44,7 +94,8 @@ async function startKafka() {
         
         // Parse and handle the message
         try {
-          //add logic here to call back to clients via websocket or other means
+          const parsedMessage = JSON.parse(value);
+          kafkaEvents.emit('message', parsedMessage);
         } catch (error) {
           console.error('Failed to parse Kafka message:', error);
         }
@@ -63,16 +114,23 @@ async function startKafka() {
 
 
 async function publishEvent(eventType, data) {
+  // Silently skip if Kafka not ready
   if (!kafkaReady) {
     console.warn('⚠️  Kafka not ready, skipping event publish');
     return;
   }
   
   try {
+    // Ensure data has required fields
+    if (!data || typeof data !== 'object') {
+      console.warn('⚠️  Invalid data for event publish, skipping');
+      return;
+    }
+
     await producer.send({
       topic: 'config-events',
       messages: [{
-        key: data.key,
+        key: data.key || data.id?.toString() || 'unknown',
         value: JSON.stringify({
           eventId: generateId(),
           eventType,
@@ -85,7 +143,8 @@ async function publishEvent(eventType, data) {
     });
     console.log(`📤 Published event: ${eventType}`);
   } catch (error) {
-    console.error('Failed to publish event:', error);
+    // Log error but don't throw - prevents service restart
+    console.error('❌ Failed to publish event (non-fatal):', error.message);
   }
 }
 
@@ -109,4 +168,5 @@ module.exports = {
   publishEvent,
   shutdown,
   isReady,
+  kafkaEvents,
 };

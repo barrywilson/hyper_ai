@@ -31,13 +31,13 @@
         </main>
     </app-layout>
 
-
-    </div>
+    <config-notifications></config-notifications>
 
     <script src="api-client.js"></script>
     <script src="elements/app-header.js"></script>
     <script src="elements/dashboard-stats.js"></script>
     <script src="elements/config-table.js"></script>
+    <script src="elements/config-notifications.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
         /**
@@ -62,6 +62,9 @@
         document.addEventListener('layout-loaded', () => {
             loadConfigurations();
         });
+
+        // Listen for real-time SSE updates
+        document.addEventListener('config-updated', loadConfigurations);
 
         /**
          * Load all configurations from API

@@ -54,6 +54,7 @@ services:
     environment:
       - PORT=8080
       - API_URL=http://config-service:3000
+      - KAFKA_BROKERS=kafka:9092
     command: sh -c "npm install && node server.js"
     depends_on:
       - config-service

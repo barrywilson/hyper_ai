@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-// const kafka = require('./kafka');
+const kafka = require('./kafka');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -27,7 +27,7 @@ app.post('/api/resolve', async (req, res) => {
       });
     }
 
-    // // Dynamically load resolver based on namespace and version
+    // // // Dynamically load resolver based on namespace and version
     try {
       const resolverPath = `./resolvers/${namespace}.${version}`;
       const resolver = require(resolverPath);
@@ -39,6 +39,11 @@ app.post('/api/resolve', async (req, res) => {
       // Handle the result
       if (result.error) {
         return res.status(result.status).json({ error: result.error });
+      }
+
+      // Publish event if mutation action was successful
+      if (['create', 'update', 'delete'].includes(action)) {
+        kafka.publishEvent(action, params)
       }
 
       if (result.status === 204) {
@@ -56,16 +61,45 @@ app.post('/api/resolve', async (req, res) => {
         });
       }
 
-      return res.status(400).json({
-        error
+      // Return error message, not error object (prevents serialization issues)
+      return res.status(500).json({
+        error: error.message || 'Resolver execution failed'
       });
 
     }
 
   } catch (error) {
     console.error('API proxy error:', error);
-    res.status(500).json({ error: 'Failed to reach backend API' });
+    // Return error message, not error object
+    res.status(500).json({ 
+      error: error.message || 'Failed to reach backend API' 
+    });
   }
+});
+
+// SSE Endpoint for UI notifications
+app.get('/api/events', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive'
+  });
+
+  // Send initial connected message
+  res.write('data: {"connected":true}\n\n');
+
+  // Listener for new messages from Kafka
+  const listener = (message) => {
+    res.write(`data: ${JSON.stringify(message)}\n\n`);
+  };
+
+  // Subscribe to the kafkaEvents emitter
+  kafka.kafkaEvents.on('message', listener);
+
+  // Clean up on client disconnect
+  req.on('close', () => {
+    kafka.kafkaEvents.off('message', listener);
+  });
 });
 
 // Serve static files from public directory
@@ -79,15 +113,18 @@ app.get('/', (req, res) => {
 // Startup function with Kafka integration
 async function start() {
   try {
-    // Start Kafka first
-    // await kafka.startKafka();
-
-    // Then start Express server
+    // Start Express server immediately so the UI is accessible
     app.listen(PORT, () => {
       console.log(`\n🚀 Config UI Server Started`);
       console.log(`   HTTP: http://localhost:${PORT}`);
-      // console.log(`   Kafka: ${kafka.isReady() ? '✅ Connected' : '❌ Disconnected'}`);
       console.log(`   Resolver: ✅ Dynamic loading enabled\n`);
+    });
+
+    // Start Kafka asynchronously in the background
+    kafka.startKafka().then(() => {
+      console.log(`   Kafka: ✅ Connected in background`);
+    }).catch((error) => {
+      console.error('   Kafka background connection failed:', error.message);
     });
 
   } catch (error) {
@@ -99,7 +136,7 @@ async function start() {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('\n📛 SIGTERM received, shutting down gracefully...');
-  // await kafka.shutdown();?
+  await kafka.shutdown();
   process.exit(0);
 });
 
