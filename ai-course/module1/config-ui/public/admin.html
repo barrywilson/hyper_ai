@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="transitions.css">
 </head>
 <body>
-    <app-layout footer='Configuration Service Admin Dashboard'>
+    <app-layout footer='Configuration Service Admin Dashboard' id="appLayout">
         <app-header heading="⚙️ Admin Dashboard" subheading="Configuration Management">           
             <div slot="actions">
                 <a href="index.html">← Back to App</a>
@@ -37,11 +37,7 @@
                 </button>
             </div>
 
-            <!-- Message Display -->
-            <app-message id="message"></app-message>
-
-            <!-- Loading State -->
-            <app-loading id="loading"></app-loading>
+            
 
             <!-- Configurations Table -->
             <div class="table-wrapper">
@@ -104,8 +100,7 @@
         const configModal = document.getElementById('configModal');
         const configForm = document.getElementById('configForm');
         const configTable = document.getElementById('config-table');
-        const message = document.getElementById('message');
-        const loading = document.getElementById('loading');
+        const appLayout = document.getElementById('appLayout');
         const searchInput = document.getElementById('searchInput');
         const addConfigBtn = document.getElementById('addConfigBtn');
         const closeModalBtn = document.getElementById('closeModal');
@@ -141,8 +136,8 @@
         }
 
         async function loadConfigs() {
-            loading.show();
-            message.hide();
+            appLayout.ShowMessage('Loading configurations...');
+            appLayout.ShowProgress(true);
             
             try {
                 allConfigs = await api('list');
@@ -155,9 +150,11 @@
                 }
                 
             } catch (error) {
-                message.show('Error loading configurations: ' + error.message, 'error');
+                console.error('Error loading configurations:', error);
+                appLayout.ShowMessage('Failed to load configurations: ' + error.message);
             } finally {
-                loading.hide();
+                appLayout.ShowProgress(false);
+                appLayout.ShowMessage('');
             }
         }
 
@@ -207,7 +204,7 @@
             const description = document.getElementById('description').value.trim();
             
             if (!key || !value) {
-                message.show('Key name and value are required', 'error');
+                appLayout.ShowMessage('Key name and value are required', 'error');
                 return;
             }
             
@@ -218,20 +215,20 @@
                         value,
                         description: description || null
                     });
-                    message.show('Configuration updated successfully!', 'success');
+                    appLayout.ShowMessage('Configuration updated successfully!', 'success');
                 } else {
                     await api('create', {
                         key,
                         value,
                         description: description || null
                     });
-                    message.show('Configuration created successfully!', 'success');
+                    appLayout.ShowMessage('Configuration created successfully!', 'success');
                 }
                 
                 closeModal();
                 loadConfigs();
             } catch (error) {
-                message.show('Error: ' + error.message, 'error');
+                appLayout.ShowMessage('Error: ' + error.message, 'error');
             }
         }
 
@@ -240,10 +237,10 @@
             
             try {
                 await api('delete', { id: parseInt(id) });
-                message.show('Configuration deleted successfully!', 'success');
+                appLayout.ShowMessage('Configuration deleted successfully!', 'success');                
                 loadConfigs();
             } catch (error) {
-                message.show('Error: ' + error.message, 'error');
+                appLayout.ShowMessage('Error: ' + error.message, 'error');
             }
         }
 

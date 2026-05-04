@@ -8,7 +8,7 @@
 </head>
 <body>    
     
-        <app-layout footer='Configuration Mainboard'>
+        <app-layout footer='Configuration Mainboard' id="appLayout">
             <app-header heading="Configuration Service" subheading="Manage your application configurations">         
                 <div slot="actions">
                     <a href="admin.html">⚙️ Admin Dashboard</a>
@@ -17,15 +17,13 @@
 
             <main>
                 <!-- Configurations Table -->
-                <section class="table-section">
-                    <h2>Configurations (Read-Only)</h2>
-                    <app-message id="message"></app-message>
-                    <app-loading id="loading"></app-loading>
-                    
-                    <div class="table-wrapper">
-                        <config-table id="config-table" readonly></config-table>
-                    </div>
-                </section>
+            <section class="table-section">
+                <h2>Configurations (Read-Only)</h2>
+                <app-message id="message"></app-message>        
+                <div class="table-wrapper">
+                    <config-table id="config-table" readonly></config-table>
+                </div>
+            </section>
             </main>
         </app-layout>       
 
@@ -54,9 +52,9 @@
         });
 
         // DOM Elements
-        const message = document.getElementById('message');
-        const loading = document.getElementById('loading');
+
         const configTable = document.getElementById('config-table');
+        const appLayout = document.getElementById('appLayout');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {    
@@ -68,9 +66,10 @@
          */
         async function loadConfigurations() {
             try {
-                loading.show();
-                message.hide();
-                
+                                
+                appLayout.ShowMessage('Loading configurations...');
+                appLayout.ShowProgress(true);
+             
                 const configurations = await configApi('list');
                 
                 if (configTable) {
@@ -79,9 +78,10 @@
                 
             } catch (error) {
                 console.error('Error loading configurations:', error);
-                message.show('Failed to load configurations: ' + error.message, 'error');
-            } finally {
-                loading.hide();
+                appLayout.ShowMessage('Failed to load configurations: ' + error.message);
+            } finally {            
+                appLayout.ShowProgress(false);
+                appLayout.ShowMessage('');
             }
         }
     </script>

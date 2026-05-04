@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const kafka = require('./kafka');
+// const kafka = require('./kafka');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -15,39 +15,41 @@ app.use(express.urlencoded({ extended: true }));
 // API Resolver Proxy - Dynamically loads resolvers and translates to REST API calls
 app.post('/api/resolve', async (req, res) => {
   try {
+    console.log('Received API resolver request:', req.body);
     const fetch = (await import('node-fetch')).default;
     const { namespace, version, action, params } = req.body;
     console.log(`Received resolver request: namespace=${namespace}, version=${version}, action=${action}`);
-    // Validate required fields
+    // // Validate required fields
     if (!namespace || !version || !action) {
       return res.status(400).json({ 
         error: 'Missing required fields: namespace, version, action' 
       });
     }
     
-    // Dynamically load resolver based on namespace and version
+    // // Dynamically load resolver based on namespace and version
     try {
       const resolverPath = `./resolvers/${namespace}.${version}`;
       const resolver = require(resolverPath);
       const resolvedUrl = API_URLS[`${namespace}.${version}`];
+      // console.log(resolverPath, resolvedUrl);
       // Execute the resolver
       const result = await resolver.resolve(fetch, resolvedUrl, { action, params });
       
       // Handle the result
       if (result.error) {
-        return res.status(result.status).json({ error: result.error });
+        res.status(result.status).json({ error: result.error });
       }
       
       if (result.status === 204) {
-        return res.status(204).send();
+        res.status(204).send();
       }
       
-      return res.status(result.status).json(result.data);
+      res.status(result.status).json(result.data);
       
     } catch (error) {
       // Handle resolver not found
       if (error.code === 'MODULE_NOT_FOUND') {
-        return res.status(400).json({ 
+        res.status(400).json({ 
           error: `Unknown namespace: ${namespace} or version: ${version}` 
         });
       }
@@ -72,13 +74,13 @@ app.get('/', (req, res) => {
 async function start() {
   try {
     // Start Kafka first
-    await kafka.startKafka();
+    // await kafka.startKafka();
     
     // Then start Express server
     app.listen(PORT, () => {
       console.log(`\n🚀 Config UI Server Started`);
       console.log(`   HTTP: http://localhost:${PORT}`);
-      console.log(`   Kafka: ${kafka.isReady() ? '✅ Connected' : '❌ Disconnected'}`);
+      // console.log(`   Kafka: ${kafka.isReady() ? '✅ Connected' : '❌ Disconnected'}`);
       console.log(`   Resolver: ✅ Dynamic loading enabled\n`);
     });
     
@@ -91,7 +93,7 @@ async function start() {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('\n📛 SIGTERM received, shutting down gracefully...');
-  await kafka.shutdown();
+  // await kafka.shutdown();?
   process.exit(0);
 });
 
