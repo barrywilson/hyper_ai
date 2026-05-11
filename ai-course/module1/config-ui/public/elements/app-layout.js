@@ -54,7 +54,8 @@
 
             await this.loadScripts([
                 "elements/app-message.js",
-                "elements/app-loading.js"
+                "elements/app-loading.js",
+                "elements/config-notifications.js"
             ]);
 
             this.loading = document.getElementById(this.id + '-loading');

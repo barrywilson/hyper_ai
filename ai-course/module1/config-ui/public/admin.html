@@ -45,7 +45,6 @@
     <script src="elements/config-search.js"></script>
     <script src="elements/config-table.js"></script>
     <script src="elements/config-modal.js"></script>
-    <script src="elements/config-notifications.js"></script>
     <script src="elements/app-layout.js"></script>
     <script>
         // Initialize API with resolver pattern
@@ -119,8 +118,8 @@
         }
 
         function filterConfigs(e) {
-            const query = e && e.detail && e.detail.query !== undefined 
-                ? e.detail.query 
+            const query = e && e.detail && e.detail.query !== undefined
+                ? e.detail.query
                 : configSearch.value.toLowerCase();
             const filtered = allConfigs.filter(config =>
                 config.key.toLowerCase().includes(query)

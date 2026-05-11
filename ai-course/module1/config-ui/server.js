@@ -42,9 +42,9 @@ app.post('/api/resolve', async (req, res) => {
       }
 
       // Publish event if mutation action was successful
-      if (['create', 'update', 'delete'].includes(action)) {
-        kafka.publishEvent(action, params)
-      }
+      // if (['create', 'update', 'delete'].includes(action)) {
+      //   kafka.publishEvent(action, params)
+      // }
 
       if (result.status === 204) {
         return res.status(204).send();

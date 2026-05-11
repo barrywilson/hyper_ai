@@ -12,7 +12,7 @@ async function resolve(fetch, apiUrl, { action, params }) {
       url = `${apiUrl}/api/configurations`;
       method = 'GET';
       break;
-      
+
     case 'get':
       if (!params?.id) {
         return { status: 400, error: 'ID is required for get action' };
@@ -20,7 +20,7 @@ async function resolve(fetch, apiUrl, { action, params }) {
       url = `${apiUrl}/api/configurations/${params.id}`;
       method = 'GET';
       break;
-      
+
     case 'create':
       if (!params?.key || !params?.value) {
         return { status: 400, error: 'key and value are required' };
@@ -33,7 +33,7 @@ async function resolve(fetch, apiUrl, { action, params }) {
         description: params.description || null
       };
       break;
-      
+
     case 'update':
       if (!params?.id) {
         return { status: 400, error: 'ID is required for update action' };
@@ -45,7 +45,7 @@ async function resolve(fetch, apiUrl, { action, params }) {
         description: params.description || null
       };
       break;
-      
+
     case 'delete':
       if (!params?.id) {
         return { status: 400, error: 'ID is required for delete action' };
@@ -53,30 +53,36 @@ async function resolve(fetch, apiUrl, { action, params }) {
       url = `${apiUrl}/api/configurations/${params.id}`;
       method = 'DELETE';
       break;
-      
+
     default:
       return { status: 400, error: `Unknown action: ${action}` };
   }
-  
+
   // Make the REST API call
   const options = {
     method,
     headers: { 'Content-Type': 'application/json' }
   };
-  
+
   if (body) {
     options.body = JSON.stringify(body);
   }
-  
-  const response = await fetch(url, options);
-  
-  // Handle 204 No Content
-  if (response.status === 204) {
-    return { status: 204 };
+
+
+  try {
+    const response = await fetch(url, options);
+
+    // Handle 204 No Content
+    if (response.status === 204) {
+      return { status: 204 };
+    }
+    const data = await response.json();
+    return { status: response.status, data };
+  } catch (error) {
+    return { status: error }
   }
-  
-  const data = await response.json();
-  return { status: response.status, data };
+
+  // return { status: true }
 }
 
 module.exports = { resolve };
