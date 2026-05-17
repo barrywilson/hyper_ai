@@ -1,0 +1,33 @@
+[project]
+name = "knowledge-graph"
+version = "0.1.0"
+description = "Knowledge graph backend for the Module 5 Domain Language MCP example"
+requires-python = ">=3.13"
+dependencies = [
+    "pyyaml>=6.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+]
+
+[project.scripts]
+knowledge-graph = "cli.main:app"
+knowledge-graph-api = "api.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cli", "api"]
+
+[tool.pytest.ini_options]
+testpaths = ["cli", "api"]
+python_files = ["*_test.py"]

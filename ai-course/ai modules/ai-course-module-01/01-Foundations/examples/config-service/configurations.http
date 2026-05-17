@@ -1,0 +1,110 @@
+### Variables
+@baseUrl = http://localhost:8000/api/v1
+@contentType = application/json
+@appId = 01KP9SC9AWKXEYDZ58X62KNGHG
+@appName = mobile-app
+
+### Upsert Configuration - Web API Production
+### Creates or replaces the configuration for the given application_id.
+PUT {{baseUrl}}/applications/{{appId}}/config
+Content-Type: {{contentType}}
+
+{
+  "config": {
+    "database_url": "postgresql://prod:secret@db.example.com:5432/webapp",
+    "redis_url": "redis://cache.example.com:6379/0",
+    "api_key": "prod-key-abc123xyz789",
+    "max_connections": 100,
+    "timeout_seconds": 30,
+    "log_level": "INFO",
+    "feature_flags": {
+      "new_dashboard": true,
+      "beta_features": false,
+      "experimental_api": false
+    }
+  }
+}
+
+### Upsert Configuration - Web API Development
+PUT {{baseUrl}}/applications/{{appId}}/config
+Content-Type: {{contentType}}
+
+{
+  "config": {
+    "database_url": "postgresql://dev:dev@localhost:5432/webapp_dev",
+    "redis_url": "redis://localhost:6379/0",
+    "api_key": "dev-key-test123",
+    "max_connections": 10,
+    "timeout_seconds": 60,
+    "log_level": "DEBUG",
+    "feature_flags": {
+      "new_dashboard": true,
+      "beta_features": true,
+      "experimental_api": true
+    }
+  }
+}
+
+### Upsert Configuration - Mobile App
+PUT {{baseUrl}}/applications/{{appId}}/config
+Content-Type: {{contentType}}
+
+{
+  "config": {
+    "api_base_url": "https://api.example.com/v1",
+    "analytics_key": "mobile-analytics-xyz789",
+    "push_notification_key": "fcm-key-abc123",
+    "max_retries": 3,
+    "cache_ttl_seconds": 3600,
+    "enable_crash_reporting": true,
+    "minimum_app_version": "2.1.0"
+  }
+}
+
+### Upsert Configuration - Batch Processor
+PUT {{baseUrl}}/applications/{{appId}}/config
+Content-Type: {{contentType}}
+
+{
+  "config": {
+    "database_url": "postgresql://batch:secret@warehouse.example.com:5432/analytics",
+    "s3_bucket": "company-data-warehouse",
+    "aws_region": "us-east-1",
+    "batch_size": 1000,
+    "parallel_workers": 4,
+    "execution_schedule": "0 2 * * *",
+    "email_notifications": ["ops@example.com", "data@example.com"],
+    "retry_failed_batches": true,
+    "max_execution_hours": 6
+  }
+}
+
+### Update Configuration (same endpoint — PUT upserts)
+PUT {{baseUrl}}/applications/{{appId}}/config
+Content-Type: {{contentType}}
+
+{
+  "config": {
+    "database_url": "postgresql://prod:secret@db.example.com:5432/webapp",
+    "redis_url": "redis://cache.example.com:6379/0",
+    "api_key": "prod-key-abc123xyz789",
+    "max_connections": 150,
+    "timeout_seconds": 45,
+    "log_level": "INFO",
+    "feature_flags": {
+      "new_dashboard": true,
+      "beta_features": false,
+      "experimental_api": true
+    }
+  }
+}
+
+### Get Configuration by Application ID
+GET {{baseUrl}}/applications/{{appId}}/config
+
+### Get Configuration by Application Name (returns raw config dict)
+GET {{baseUrl}}/config/{{appName}}
+
+### Delete Configuration
+### There is no standalone delete — configs are removed by deleting the parent application.
+DELETE {{baseUrl}}/applications/{{appId}}

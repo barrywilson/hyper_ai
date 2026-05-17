@@ -1,0 +1,27 @@
+{
+  "eval_id": 0,
+  "eval_name": "cold-start-where-were-we",
+  "prompt": "where were we on this? haven't looked at it in a few days",
+  "assertions": [
+    {
+      "name": "uses-four-section-structure",
+      "description": "Response contains all four required H2 sections in order: 'Where we are', 'Scope', 'Watch out for', 'Recommended starting point'."
+    },
+    {
+      "name": "identifies-active-work-item",
+      "description": "Response correctly names the active work item — feature flags, work item 001, or docs/001-feature-flags.md."
+    },
+    {
+      "name": "names-current-stage",
+      "description": "Response identifies the current workflow stage as BUILD & ASSESS (or notes the user is in build/build-and-assess)."
+    },
+    {
+      "name": "no-confirmation-question",
+      "description": "Response does NOT ask the user to confirm the file scope, since no feature description was provided."
+    },
+    {
+      "name": "specific-recommended-starting-point",
+      "description": "The 'Recommended starting point' section contains one concrete next action (a specific file, function, or test to look at) rather than a generic instruction like 'continue working on feature flags'."
+    }
+  ]
+}

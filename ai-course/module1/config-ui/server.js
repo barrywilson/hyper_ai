@@ -34,23 +34,23 @@ app.post('/api/resolve', async (req, res) => {
       const resolvedUrl = API_URLS[`${namespace}.${version}`];
       // console.log(resolverPath, resolvedUrl);
       // Execute the resolver
-      const result = await resolver.resolve(fetch, resolvedUrl, { action, params });
+      // const result = await resolver.resolve(fetch, resolvedUrl, { action, params });
 
-      // Handle the result
-      if (result.error) {
-        return res.status(result.status).json({ error: result.error });
-      }
+      // // Handle the result
+      // if (result.error) {
+      //   return res.status(result.status).json({ error: result.error });
+      // }
 
       // Publish event if mutation action was successful
       // if (['create', 'update', 'delete'].includes(action)) {
       //   kafka.publishEvent(action, params)
       // }
+      res.status(204).send();
+      // if (result.status === 204) {
+      //   return res.status(204).send();
+      // }
 
-      if (result.status === 204) {
-        return res.status(204).send();
-      }
-
-      return res.status(result.status).json(result.data);
+      // return res.status(result.status).json(result.data);
 
     } catch (error) {
       // Handle resolver not found

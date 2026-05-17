@@ -1,0 +1,50 @@
+nodes:
+  - id: feature_flag
+    type: domain_term
+    area: feature_flags
+    name: FeatureFlag
+    definition: >
+      A named boolean (or enum-valued) toggle evaluated at request time. Enables
+      progressive rollout, kill-switching, and per-environment behaviour without
+      a redeploy.
+    aliases:
+      - flag
+      - toggle
+    warnings:
+      - Feature flags are evaluated dynamically and may change between calls.
+        Cache only with a known short TTL.
+      - Do not use feature flags for permanent configuration - if a value is
+        intended to stay set, it belongs in a ConfigurationItem.
+    source_files:
+      - svc/api/flags.py
+      - svc/models/feature_flag.py
+    documentation:
+      - docs/ABOUT.md
+
+  - id: flag_scope
+    type: domain_term
+    area: feature_flags
+    name: FlagScope
+    definition: >
+      The targeting expression that decides which calls evaluate a FeatureFlag
+      as true. Scope can be 'global', 'environment', or 'application'.
+    aliases:
+      - scope
+    source_files:
+      - svc/models/feature_flag.py
+    documentation:
+      - docs/ABOUT.md
+
+  - id: flag_environment_binding
+    type: domain_term
+    area: feature_flags
+    name: FlagEnvironmentBinding
+    definition: >
+      The per-environment override of a FeatureFlag's default state. Lets you
+      enable a flag in staging while keeping it disabled in production.
+    aliases:
+      - env binding
+    source_files:
+      - svc/models/feature_flag.py
+    documentation:
+      - docs/ARCHITECTURE.md

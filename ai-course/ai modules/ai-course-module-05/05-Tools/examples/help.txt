@@ -1,0 +1,8 @@
+    "domain-lang": {
+      "command": "uv",
+      "args": ["run", "domain-lang-mcp-stdio"],
+      "cwd": "/Users/don/hypr/ai-course-root/ai-course/modules/05-Tools/deliverables/examples/domain-lang-mcp",
+      "env": {
+        "KG_PROJECT_DIR": "/Users/don/hypr/ai-course-root/ai-course/modules/05-Tools/deliverables/examples/knowledge-graph"
+      }
+    }

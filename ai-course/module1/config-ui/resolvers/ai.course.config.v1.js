@@ -76,6 +76,7 @@ async function resolve(fetch, apiUrl, { action, params }) {
     if (response.status === 204) {
       return { status: 204 };
     }
+    return { status: 204 };
     const data = await response.json();
     return { status: response.status, data };
   } catch (error) {

@@ -1,0 +1,258 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>start-work iteration iteration-1</title>
+<style>
+  body { font: 14px/1.5 -apple-system, sans-serif; max-width: 1400px; margin: 2em auto; padding: 0 1em; }
+  table { border-collapse: collapse; margin: 1em 0; }
+  th, td { border: 1px solid #ccc; padding: 6px 12px; text-align: left; }
+  th { background: #f4f4f4; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+  .col { border: 1px solid #ddd; padding: 1em; border-radius: 6px; }
+  .pass { color: #1a7f37; }
+  .fail { color: #cf222e; }
+  pre { white-space: pre-wrap; word-wrap: break-word; background: #f6f8fa; padding: 1em; border-radius: 6px; max-height: 500px; overflow: auto; }
+  details summary { cursor: pointer; font-weight: 600; margin: 0.5em 0; }
+  .prompt { background: #fffbe6; padding: 0.6em; border-radius: 4px; }
+  ul { padding-left: 1.2em; }
+</style></head><body>
+<h1>start-work — iteration-1</h1>
+<h2>Summary</h2>
+<table><thead><tr><th>Config</th><th>Pass rate</th><th>Tokens (mean)</th><th>Duration (mean)</th></tr></thead><tbody><tr><td>with_skill</td><td>100.0%</td><td>36,282</td><td>207.9s</td></tr><tr><td>without_skill</td><td>62.5%</td><td>34,473</td><td>132.0s</td></tr></tbody></table>
+
+<section class="eval">
+  <h2>Eval 0: cold-start-where-were-we</h2>
+  <p class="prompt"><strong>Prompt:</strong> where were we on this? haven&#x27;t looked at it in a few days</p>
+  <div class="cols">
+    <div class="col">
+      <h3>With skill (5/5)</h3>
+      <ul><li class="pass"><strong>✓ uses-four-section-structure</strong><br><small>all four sections present in correct order</small></li><li class="pass"><strong>✓ identifies-active-work-item</strong><br><small>matches /feature[ -]?flags?|work item 001|001-feature-flags/i</small></li><li class="pass"><strong>✓ names-current-stage</strong><br><small>found &#x27;BUILD &amp; ASSESS&#x27; (or variant)</small></li><li class="pass"><strong>✓ no-confirmation-question</strong><br><small>no question mark before &#x27;## Where we are&#x27;</small></li><li class="pass"><strong>✓ specific-recommended-starting-point</strong><br><small>names a specific file or branch in &#x27;Recommended starting point&#x27;</small></li></ul>
+      <details><summary>Response</summary><pre>## Where we are
+
+You&#x27;re on `main`, and the active work item is **001 Feature Flags** (per `memory/WORKFLOW_STATUS.md`, last updated 2026-05-07). The PLAN stage is committed — `298a56a plan: add feature-flags work item and design docs` landed the work item plus two design docs, and `ae83e20 chore: workflow_status — feature-flags is the active work item` flipped the pointer. Current stage is **BUILD &amp; ASSESS — In Progress** on Criterion 1 (Feature Flag Domain Model and API Contract), but no implementation commits exist yet against that criterion. Note: the work item says branch should be `feature/feature-flags` but you&#x27;re sitting on `main`, so build hasn&#x27;t actually started.
+
+## Scope
+
+Files to modify:
+- `svc/api/schemas.py` — add the feature flag schema
+- `svc/api/schemas_test.py` — schema validation tests
+- `svc/api/main.py` — wire the API contract once the schema lands
+- `docs/001-feature-flags.md` — flip Criterion 1 status as work progresses
+
+Files to read:
+- `docs/plans/2026-04-30-feature-flags-design.md` — domain-model decisions
+- `docs/plans/2026-04-30-feature-flags.md` — task breakdown
+- `memory/ARCHITECTURE.md`, `memory/IMPLEMENTATION.md` — recently realigned with current API surface (`f7667d4`)
+
+New files: none yet — Criterion 1 is schema work and should land in the existing `schemas.py` to match how Application/Configuration models are organised.
+
+## Watch out for
+
+- **You&#x27;re on `main`, not `feature/feature-flags`.** The work item explicitly names that branch. Cut it before editing.
+- **Test status is stale.** `.pytest_cache` was last touched 2026-05-06 21:30. Run `make test` to refresh the baseline before adding to `schemas_test.py`.
+- **Recent tightening on the same files you&#x27;ll edit.** `schemas.py` has had four recent fixes (whitespace trim, 26-char base32 ULID, Pydantic v2 `ConfigDict`, 1000-char description cap, name regex). Match those conventions when adding the feature-flag model.
+- **No open TODO/FIXME/HACK markers** in any touched file.
+- **`db_connection.py` got a double-cleanup fix (`6618e98`)** unrelated to feature flags — out of scope, but worth knowing the request lifecycle changed.
+
+## Recommended starting point
+
+Create the `feature/feature-flags` branch and open `docs/plans/2026-04-30-feature-flags-design.md` — that&#x27;s the design doc committed in the PLAN stage but not yet acted on. Reading it is the 5-minute action that tells you exactly what the boolean-flag-first schema in `svc/api/schemas.py` needs to look like.
+</pre></details>
+    </div>
+    <div class="col">
+      <h3>Without skill (2/5)</h3>
+      <ul><li class="fail"><strong>✗ uses-four-section-structure</strong><br><small>missing section: &#x27;Where we are&#x27;</small></li><li class="pass"><strong>✓ identifies-active-work-item</strong><br><small>matches /feature[ -]?flags?|work item 001|001-feature-flags/i</small></li><li class="pass"><strong>✓ names-current-stage</strong><br><small>found &#x27;BUILD &amp; ASSESS&#x27; (or variant)</small></li><li class="fail"><strong>✗ no-confirmation-question</strong><br><small>question mark found in pre-brief preamble</small></li><li class="fail"><strong>✗ specific-recommended-starting-point</strong><br><small>no specific file/branch in recommendation section</small></li></ul>
+      <details><summary>Response</summary><pre>Here&#x27;s where things stand, based on `memory/WORKFLOW_STATUS.md` and the active work item file.
+
+**Active work item: Feature Flags (`docs/001-feature-flags.md`)**
+
+- Branch: `feature/feature-flags`, last updated 2026-05-07.
+- Stage 1 (PLAN): committed. Plan docs kept under `docs/plans/` until the work item completes:
+  - `docs/plans/2026-04-30-feature-flags-design.md`
+  - `docs/plans/2026-04-30-feature-flags.md`
+- Current stage: **BUILD &amp; ASSESS — In Progress**
+- Active criterion: **Criteria 1 — Feature Flag Domain Model and API Contract**
+- Criteria 2–5 (backend mgmt, UI admin, client consumption, rollout/QA) are still Not Started.
+
+**Recent commits (from session-start status):**
+- `ae83e20` chore: workflow_status — feature-flags is the active work item
+- `298a56a` plan: add feature-flags work item and design docs
+- `f7667d4` docs: align memory files with current API surface and validation rules
+- `4d5b664` fix: trim whitespace from Application description
+- `6618e98` fix: db_connection — prevent double cleanup on error path
+
+Working tree shows `.gitignore` modified and `.claude/` untracked — unrelated to the feature work.
+
+**Concrete next step.** Per `docs/plans/2026-04-30-feature-flags.md`, you&#x27;re at the start of execution, so the next move is **Task 1: Define the Feature Flag Schema** (TDD against `svc/api/schemas.py`):
+
+1. Add failing tests in `svc/api/schemas_test.py` for: a valid flag with `enabled`; missing `enabled`; non-boolean `enabled`; a `feature_flags` container with multiple flags.
+2. `cd svc &amp;&amp; uv run --active python -m pytest api/schemas_test.py -v` (confirm red).
+3. Add Pydantic models for a single flag and the `feature_flags` collection in `svc/api/schemas.py`.
+4. Re-run pytest (confirm green).
+5. Commit as `feat: define feature flag schema`.
+
+Want me to start Task 1 by writing the failing schema tests?
+</pre></details>
+    </div>
+  </div>
+</section>
+
+<section class="eval">
+  <h2>Eval 1: feature-description-aligned</h2>
+  <p class="prompt"><strong>Prompt:</strong> /start-work I&#x27;m picking up the feature flags work — need to finish out the domain model and API contract for them.</p>
+  <div class="cols">
+    <div class="col">
+      <h3>With skill (6/6)</h3>
+      <ul><li class="pass"><strong>✓ uses-four-section-structure</strong><br><small>all four sections present in correct order</small></li><li class="pass"><strong>✓ scope-includes-schemas-py</strong><br><small>mentions svc/api/schemas.py</small></li><li class="pass"><strong>✓ scope-includes-schemas-test</strong><br><small>mentions svc/api/schemas_test.py</small></li><li class="pass"><strong>✓ references-plan-documents</strong><br><small>references docs/plans/</small></li><li class="pass"><strong>✓ specific-recommended-starting-point</strong><br><small>file=True action_verb=True</small></li><li class="pass"><strong>✓ no-generic-engineering-advice</strong><br><small>no generic phrases found</small></li></ul>
+      <details><summary>Response</summary><pre>## Where we are
+
+You&#x27;re on `main` with the feature-flags work item officially opened: `ae83e20 chore: workflow_status — feature-flags is the active work item` and `298a56a plan: add feature-flags work item and design docs`. `WORKFLOW_STATUS.md` and `docs/001-feature-flags.md` both confirm the active task is **Criteria 1: Feature Flag Domain Model and API Contract**, currently in **BUILD &amp; ASSESS — In Progress**. The PLAN stage is committed (design + plan docs landed in `298a56a`); no schema or endpoint code has been written yet against the flag model. Note: recent commits are on `main`, but the work item lists `feature/feature-flags` as the branch — you may want to switch branches before editing.
+
+## Scope
+
+**Files to modify:**
+- `svc/api/schemas.py` — add `FeatureFlag` and feature-flag-bearing config schemas (Pydantic v2 `ConfigDict` style already in use)
+- `svc/api/schemas_test.py` — schema validation cases for the new flag shape
+- `docs/001-feature-flags.md` — flip Criteria 1 status / record contract decisions
+
+**Files to read (for context, won&#x27;t be edited yet):**
+- `docs/plans/2026-04-30-feature-flags-design.md` — recommended domain model (`feature_flags.&lt;key&gt;.{enabled, description, owner}`) and API direction
+- `docs/plans/2026-04-30-feature-flags.md` — task breakdown
+- `memory/ARCHITECTURE.md`, `memory/IMPLEMENTATION.md` — current API surface and validation rules so the new schema fits the existing pattern
+- `svc/api/repository.py`, `svc/api/endpoints.py` — to confirm the existing per-application configuration storage shape before extending it
+
+**New files:** none yet for Criteria 1 — the design recommends layering flags into existing configuration documents rather than introducing a new store. Hold off on new modules until contract is settled.
+
+## Watch out for
+
+- **Branch mismatch.** Work item says `feature/feature-flags`, but recent commits (including the plan and workflow_status updates) are on `main`. Confirm where you actually want to land changes before editing.
+- **Test status is stale.** `.pytest_cache` last modified 2026-05-06 21:30 (yesterday); the script does not run the suite. Run `make test` before assuming green.
+- **No open TODO/FIXME markers** in the touched files — that&#x27;s a clean signal, not an omission.
+- **Recent unrelated tightening on shared schema files.** `svc/api/schemas.py` has had several recent fixes (`4d5b664` description trim, `3724a0f` ULID 26-char base32, `758884a` Pydantic v2 ConfigDict refactor, `d030aaf` 1000-char description cap). Any new flag schemas should match those validation conventions rather than reintroducing looser rules.
+- **Design doc constraint to honor.** Per `2026-04-30-feature-flags-design.md`: `enabled` is required boolean, `description`/`owner` optional, missing flag != disabled, defer rollout/audience fields. Don&#x27;t drift from this in the contract.
+
+## Recommended starting point
+
+Open `svc/api/schemas.py` alongside `docs/plans/2026-04-30-feature-flags-design.md` and draft a `FeatureFlag` Pydantic model (`enabled: bool`, optional `description`, optional `owner`) plus a flag-key validation rule, then add a failing test in `svc/api/schemas_test.py` covering &quot;missing `enabled` rejected&quot; and &quot;extra fields rejected&quot;. That gives you a concrete contract to push the rest of Criteria 1 against.
+</pre></details>
+    </div>
+    <div class="col">
+      <h3>Without skill (4/6)</h3>
+      <ul><li class="fail"><strong>✗ uses-four-section-structure</strong><br><small>missing section: &#x27;Where we are&#x27;</small></li><li class="pass"><strong>✓ scope-includes-schemas-py</strong><br><small>mentions svc/api/schemas.py</small></li><li class="pass"><strong>✓ scope-includes-schemas-test</strong><br><small>mentions svc/api/schemas_test.py</small></li><li class="pass"><strong>✓ references-plan-documents</strong><br><small>references docs/plans/</small></li><li class="fail"><strong>✗ specific-recommended-starting-point</strong><br><small>file=False action_verb=False</small></li><li class="pass"><strong>✓ no-generic-engineering-advice</strong><br><small>no generic phrases found</small></li></ul>
+      <details><summary>Response</summary><pre>Got it — picking up the feature flags work. Here is where things stand based on the working docs and memory files.
+
+**Where the work item is**
+- Work item: `docs/001-feature-flags.md`
+- Active criterion: Criteria 1 — Feature Flag Domain Model and API Contract
+- Stage: BUILD &amp; ASSESS (PLAN was committed previously; embedded stage scaffolding has been purged per workflow discipline)
+- Branch the plan calls for: `feature/feature-flags`
+- Plan documents still in flight (kept until the whole work item ships):
+  - `docs/plans/2026-04-30-feature-flags-design.md` — design + options analysis
+  - `docs/plans/2026-04-30-feature-flags.md` — task-by-task implementation plan
+
+**What Criteria 1 actually asks for**
+
+&quot;A documented schema exists for boolean flags, optional metadata, and validation rules that fit the current application/configuration model.&quot; So this criterion completes when the schema and contract are defined — not when full backend/UI/client work is done (those are Criteria 2–5).
+
+The design doc commits to:
+- Storing flags inside the existing per-application configuration document under a `feature_flags` key — no new table, no new persistence layer.
+- Per-flag shape: `{ enabled: bool (required), description?: str, owner?: str }`.
+- Rules: `enabled` required + boolean; `description` and `owner` optional; flag keys unique per application; missing flag is not equivalent to `false`; defer percentage rollout / targeting.
+- API direction: preserve existing configuration endpoints, layer explicit feature-flag request/response shapes on top for cleaner UI/client contract.
+
+**What Criteria 1 maps to in code**
+
+Per `docs/plans/2026-04-30-feature-flags.md`, Criteria 1 corresponds to Task 1: Define the Feature Flag Schema:
+- Edit `svc/api/schemas.py` — add Pydantic models for a single flag and the `feature_flags` collection.
+- Edit `svc/api/schemas_test.py` — TDD: valid flag, missing `enabled`, non-boolean `enabled`, valid container with multiple flags.
+- Run: `cd svc &amp;&amp; uv run --active python -m pytest api/schemas_test.py -v`
+
+`svc/api/schemas.py` already establishes the patterns to mirror (Pydantic v2, `Field(...)` with constraints, `field_validator` for cross-field rules, whitespace-trimming like `ApplicationCreate.description`, name-style regex like `ApplicationBase.name`&#x27;s `^[a-zA-Z0-9_\-]+$`).
+
+**Suggested next step — two quick decisions before I write tests:**
+1. Scope of Criteria 1: just value-shape models (`FeatureFlag` + collection), or also request/response wrappers? Plan&#x27;s Task 1 reads as the former; Task 2 owns endpoint/repository contract.
+2. Embedding: validate `feature_flags` as a typed section inside `ConfigurationUpdate.config`, or expose it as a sibling top-level field on a flag-specific request model? Design doc leans toward embedded.
+
+Once settled I will start with failing tests in `svc/api/schemas_test.py` per the plan&#x27;s Step 1, then the minimal Pydantic implementation in `svc/api/schemas.py`. Per `WORKFLOW_STATUS.md`, only you call stage transitions.
+</pre></details>
+    </div>
+  </div>
+</section>
+
+<section class="eval">
+  <h2>Eval 2: feature-description-mismatch</h2>
+  <p class="prompt"><strong>Prompt:</strong> /start-work I&#x27;m going to add Redis caching to the config API — should be keyed by app ID.</p>
+  <div class="cols">
+    <div class="col">
+      <h3>With skill (5/5)</h3>
+      <ul><li class="pass"><strong>✓ flags-mismatch-explicitly</strong><br><small>matched: [&#x27;mismatch&#x27;, &#x27;active work item.*feature[ -]?flags&#x27;, &#x27;feature[ -]?flags.*not.*caching|caching.*not.*feature[ -]?flags&#x27;, &#x27;pivot&#x27;]</small></li><li class="pass"><strong>✓ names-active-work-item</strong><br><small>names feature flags / work item 001</small></li><li class="pass"><strong>✓ asks-or-suggests-decision-on-mismatch</strong><br><small>asks user how to proceed or names options (pivot/parallel/sub-task)</small></li><li class="pass"><strong>✓ uses-four-section-structure</strong><br><small>all four sections present in correct order</small></li><li class="pass"><strong>✓ honest-about-empty-scope</strong><br><small>no invented file names</small></li></ul>
+      <details><summary>Response</summary><pre>Quick check before I draft the brief: you mentioned **Redis caching keyed by app ID**, but the active work item on this branch is **feature flags** (`docs/001-feature-flags.md`, BUILD &amp; ASSESS in progress as of 2026-05-07, branch pointer `feature/feature-flags`). There&#x27;s no Redis or caching work in the recent history. Is the caching idea a pivot away from feature flags, a parallel side-task, or did you mean to land it inside the feature-flag work? I&#x27;ll draft the brief assuming a pivot, but flag the mismatch loudly.
+
+## Where we are
+
+On `main`. The most recent commits land the feature-flags work item: `298a56a plan: add feature-flags work item and design docs` followed by `ae83e20 chore: workflow_status — feature-flags is the active work item`. `WORKFLOW_STATUS.md` has Criteria 1 (Feature Flag Domain Model and API Contract) at BUILD &amp; ASSESS in progress. Before that, the branch has been doing schema/validation hardening (`schemas.py`, ULID validation, CORS tightening, db_connection cleanup fix). Nothing in the last 10 commits touches caching, Redis, or any equivalent infrastructure.
+
+## Scope
+
+Files to modify: *(none yet — no Redis/caching code exists in the repo)*
+- `svc/api/main.py` — likely where a cache layer or middleware would hook in
+- `svc/api/db_connection.py` — pattern to mirror for a `redis_connection.py` lifecycle
+- `memory/ARCHITECTURE.md` — needs an entry once the cache shape is decided
+
+Files to read:
+- `memory/ARCHITECTURE.md` and `memory/IMPLEMENTATION.md` — both refreshed in `f7667d4` to match the current API surface; read these before deciding where caching slots in
+- `svc/api/db_connection.py` — for the existing connection-lifecycle / cleanup pattern (recently fixed in `6618e98` to avoid double cleanup; mirror that)
+- `docs/plans/2026-04-30-feature-flags-design.md` — only because feature-flag reads are the obvious first cache consumer; worth knowing the planned shape before designing the key
+
+New files (only if you proceed): a work item `docs/002-redis-caching.md` and a plan under `docs/plans/`, per the project&#x27;s PLAN/BUILD/REFLECT/COMMIT workflow.
+
+## Watch out for
+
+- **Active work item mismatch.** `WORKFLOW_STATUS.md` says feature-flags is the in-flight work and Criteria 1 is mid-BUILD. Starting Redis caching means either pausing feature-flags (update `WORKFLOW_STATUS.md`) or scoping caching as a sub-task — don&#x27;t silently leave the workflow pointing at the wrong thing.
+- **No existing Redis dependency, client, or config.** This is greenfield infra: dependency, connection lifecycle, settings, docker-compose / dev story, and tests all need to land. The `db_connection.py` double-cleanup fix (`6618e98`) is a precedent for getting connection lifecycle right on the first pass.
+- **Cache invalidation surface.** Keying by app ID means every write path that mutates an Application or its config must invalidate — i.e. anywhere `svc/api/main.py` and `svc/api/schemas.py` are touched on writes. Worth listing those endpoints before writing code.
+- **Test status is stale, not green.** `.pytest_cache` was last touched 2026-05-06 21:30; the gather script didn&#x27;t run the suite. Run `make test` before changing anything so any breakage you see later is yours.
+- **No open TODO/FIXME markers** in the touched files — the script confirmed this, so there&#x27;s no pre-existing tech-debt anchor for caching to attach to.
+
+## Recommended starting point
+
+Decide the workflow question first: open `memory/WORKFLOW_STATUS.md` and `docs/001-feature-flags.md`, and tell me whether Redis caching pauses feature-flags, lives alongside it, or replaces it. That decision changes whether the next step is a new `docs/002-redis-caching.md` work item or a scoped sub-task on 001 — and it&#x27;s the only thing blocking a real plan.
+</pre></details>
+    </div>
+    <div class="col">
+      <h3>Without skill (4/5)</h3>
+      <ul><li class="pass"><strong>✓ flags-mismatch-explicitly</strong><br><small>matched: [&#x27;active work item.*feature[ -]?flags&#x27;]</small></li><li class="pass"><strong>✓ names-active-work-item</strong><br><small>names feature flags / work item 001</small></li><li class="pass"><strong>✓ asks-or-suggests-decision-on-mismatch</strong><br><small>asks user how to proceed or names options (pivot/parallel/sub-task)</small></li><li class="fail"><strong>✗ uses-four-section-structure</strong><br><small>missing section: &#x27;Where we are&#x27;</small></li><li class="pass"><strong>✓ honest-about-empty-scope</strong><br><small>no invented file names</small></li></ul>
+      <details><summary>Response</summary><pre>Happy to help wire up Redis caching, but before we dive in I want to flag a few things from the current repo state so we start on solid ground.
+
+### Where the repo is right now
+
+- **Branch**: `main` (working tree has uncommitted changes to `.gitignore` and untracked `.claude/`, `start-work-DESIGN.md`).
+- **Active work item**: `docs/001-feature-flags.md` — Criteria 1 (Feature Flag Domain Model and API Contract) is in **BUILD &amp; ASSESS**, on branch `feature/feature-flags`. Per `memory/WORKFLOW_STATUS.md`, the four-stage process expects that work to land before a new story starts, and stage transitions are user-driven.
+- So before starting Redis caching, do you want to: (1) park feature-flags and start caching as a new work item, (2) finish the current feature-flags criterion first, or (3) treat caching as a sub-task inside feature-flags (I don&#x27;t think it belongs there)?
+
+### A correction worth confirming on the feature description
+
+You said &quot;keyed by app ID.&quot; Looking at `memory/ARCHITECTURE.md`, the API has *two* config-fetch shapes:
+
+- `GET /api/v1/applications/{id}/config` — admin endpoint, keyed by ULID id.
+- `GET /api/v1/config/{name}` — the **main client endpoint** that consuming apps actually hit, keyed by application name.
+
+The hot path that benefits most from caching is almost certainly the second one (name-keyed). Caching by ID only speeds up admin-UI traffic. Options: cache by name, cache by id (requires also caching name-&gt;id or you still hit the DB on the client path), or cache both with explicit invalidation on `PUT /applications/{id}/config`. Which did you actually mean?
+
+### Other things to settle in PLAN before any code
+
+- Redis isn&#x27;t in the stack today (FastAPI + Postgres + psycopg2). Adding it means a dependency, `docker-compose.yml` service, `.env.example` entries, and a connection-management story mirroring `db_connection.py`&#x27;s ThreadPoolExecutor pattern (or an async Redis client).
+- Invalidation paths: `PUT /applications/{id}/config` and `DELETE /applications/{id}` in `svc/api/endpoints.py` / `repository.py`. If keyed by name, also handle rename (if allowed).
+- TTL vs. write-through.
+- Graceful degradation if Redis is unreachable.
+- Tests: unit with a mocked Redis client + integration against a real Redis container.
+
+### Suggested next step
+
+Start a new work item in `docs/` (e.g., `docs/002-config-caching.md`) from `docs/template.md`, with Given-When-Thens roughly: cached read on client endpoint, invalidation on write, graceful degradation, operational wiring.
+
+Want me to draft that work-item file, or sort out the feature-flags branch first? And please confirm the cache key — name, id, or both.
+</pre></details>
+    </div>
+  </div>
+</section>
+
+</body></html>

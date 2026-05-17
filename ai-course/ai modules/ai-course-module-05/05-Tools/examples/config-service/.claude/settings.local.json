@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make test-ui:*)",
+      "Bash(npm run build:*)",
+      "Bash(make:*)",
+      "Bash(docker compose:*)",
+      "Bash(uv sync:*)",
+      "Read(//Users/don/hypr/ai-course/module3/examples/after/**)",
+      "Bash(uv run:*)",
+      "Bash(uv add:*)",
+      "Bash(curl:*)",
+      "Bash(python:*)",
+      "Bash(cat:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose:*)",
+      "WebSearch",
+      "Bash(find:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(git add:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker logs:*)",
+      "Bash(mkdir -p /Users/don/hypr/ai-course-root/ai-course/modules/04-Skills/deliverables/examples/config-service/.claude/skills/start-work/scripts)",
+      "Bash(chmod +x /Users/don/hypr/ai-course-root/ai-course/modules/04-Skills/deliverables/examples/config-service/.claude/skills/start-work/scripts/gather_context.sh)",
+      "Bash(/Users/don/hypr/ai-course-root/ai-course/modules/04-Skills/deliverables/examples/config-service/.claude/skills/start-work/scripts/gather_context.sh)",
+      "Bash(mkdir -p /Users/don/hypr/ai-course-root/ai-course/modules/04-Skills/deliverables/examples/config-service/.claude/skills/start-work/evals)",
+      "Bash(python3 grade.py iteration-1)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 build_benchmark.py iteration-1)",
+      "Bash(.claude/skills/start-work/scripts/gather_context.sh)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "/Users/don/hypr/ai-course-root/ai-course/modules/04-Skills/deliverables/examples/config-service/.claude/skills/start-work"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "skill_name": "start-work",
+  "evals": [
+    {
+      "id": 0,
+      "name": "cold-start-where-were-we",
+      "prompt": "where were we on this? haven't looked at it in a few days",
+      "expected_output": "A four-section brief (Where we are / Scope / Watch out for / Recommended starting point) that correctly identifies the active work item as feature flags (docs/001-feature-flags.md), notes BUILD & ASSESS stage, and proposes a concrete next step grounded in the work item's current state. Should NOT ask a confirmation question since no feature description was given.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "feature-description-aligned",
+      "prompt": "/start-work I'm picking up the feature flags work — need to finish out the domain model and API contract for them.",
+      "expected_output": "A four-section brief that recognises the user's intent matches the active work item (Criteria 1: Feature Flag Domain Model and API Contract). Scope should call out svc/api/schemas.py and likely a new feature_flags module. Should reference the plan documents under docs/plans/. Optional one-line confirmation of file scope is acceptable; long preambles or generic advice are not.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "feature-description-mismatch",
+      "prompt": "/start-work I'm going to add Redis caching to the config API — should be keyed by app ID.",
+      "expected_output": "A four-section brief that flags the mismatch: the active work item is feature flags, not caching. Should surface this clearly in 'Where we are' or 'Watch out for', and either ask whether the user wants to switch context or proceed with caching as net-new work outside the current work item. Should NOT silently produce a caching brief as if the workflow status didn't exist.",
+      "files": []
+    }
+  ]
+}

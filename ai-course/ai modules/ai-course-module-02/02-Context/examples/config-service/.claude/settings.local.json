@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test *)",
+      "Bash(npm run *)",
+      "Bash(make test-svc *)",
+      "Bash(make test-ui *)",
+      "Bash(npx vitest *)",
+      "Bash(kill %1)"
+    ]
+  }
+}

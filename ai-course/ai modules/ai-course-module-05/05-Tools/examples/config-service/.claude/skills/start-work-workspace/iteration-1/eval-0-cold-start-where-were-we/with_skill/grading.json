@@ -1,0 +1,34 @@
+{
+  "eval_id": 0,
+  "eval_name": "cold-start-where-were-we",
+  "run": "with_skill",
+  "expectations": [
+    {
+      "text": "uses-four-section-structure",
+      "passed": true,
+      "evidence": "all four sections present in correct order"
+    },
+    {
+      "text": "identifies-active-work-item",
+      "passed": true,
+      "evidence": "matches /feature[ -]?flags?|work item 001|001-feature-flags/i"
+    },
+    {
+      "text": "names-current-stage",
+      "passed": true,
+      "evidence": "found 'BUILD & ASSESS' (or variant)"
+    },
+    {
+      "text": "no-confirmation-question",
+      "passed": true,
+      "evidence": "no question mark before '## Where we are'"
+    },
+    {
+      "text": "specific-recommended-starting-point",
+      "passed": true,
+      "evidence": "names a specific file or branch in 'Recommended starting point'"
+    }
+  ],
+  "passed": 5,
+  "total": 5
+}

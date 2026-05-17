@@ -1,0 +1,40 @@
+### Variables
+@baseUrl = http://localhost:8000/api/v1
+@contentType = application/json
+@appId = 01KP9SB2XTGF0GKJ7ZA9D0DYXR
+
+### Create Application - Web API
+POST {{baseUrl}}/applications
+Content-Type: {{contentType}}
+
+{
+  "name": "web-api",
+  "description": "Main REST API service for customer-facing web application"
+}
+
+### Create Application - Mobile App
+POST {{baseUrl}}/applications
+Content-Type: {{contentType}}
+
+{
+  "name": "mobile-app",
+  "description": "iOS and Android mobile application backend"
+}
+
+### Create Application - Batch Processor
+POST {{baseUrl}}/applications
+Content-Type: {{contentType}}
+
+{
+  "name": "batch-processor",
+  "description": "Nightly batch job processor for data aggregation"
+}
+
+### Get All Applications
+GET {{baseUrl}}/applications
+
+### Get Application by ID
+GET {{baseUrl}}/applications/{{appId}}
+
+### Delete Application (cascades to its configuration)
+DELETE {{baseUrl}}/applications/{{appId}}

@@ -1,0 +1,34 @@
+{
+  "eval_id": 2,
+  "eval_name": "feature-description-mismatch",
+  "run": "with_skill",
+  "expectations": [
+    {
+      "text": "flags-mismatch-explicitly",
+      "passed": true,
+      "evidence": "matched: ['mismatch', 'active work item.*feature[ -]?flags', 'feature[ -]?flags.*not.*caching|caching.*not.*feature[ -]?flags', 'pivot']"
+    },
+    {
+      "text": "names-active-work-item",
+      "passed": true,
+      "evidence": "names feature flags / work item 001"
+    },
+    {
+      "text": "asks-or-suggests-decision-on-mismatch",
+      "passed": true,
+      "evidence": "asks user how to proceed or names options (pivot/parallel/sub-task)"
+    },
+    {
+      "text": "uses-four-section-structure",
+      "passed": true,
+      "evidence": "all four sections present in correct order"
+    },
+    {
+      "text": "honest-about-empty-scope",
+      "passed": true,
+      "evidence": "no invented file names"
+    }
+  ],
+  "passed": 5,
+  "total": 5
+}

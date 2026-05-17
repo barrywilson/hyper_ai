@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "feature-description-aligned",
+  "prompt": "/start-work I'm picking up the feature flags work — need to finish out the domain model and API contract for them.",
+  "assertions": [
+    {
+      "name": "uses-four-section-structure",
+      "description": "Response contains all four required H2 sections in order: 'Where we are', 'Scope', 'Watch out for', 'Recommended starting point'."
+    },
+    {
+      "name": "scope-includes-schemas-py",
+      "description": "The 'Scope' section names svc/api/schemas.py as a file to modify (this is where Criteria 1's domain model goes)."
+    },
+    {
+      "name": "scope-includes-schemas-test",
+      "description": "The 'Scope' section names svc/api/schemas_test.py as a file to modify (TDD on the new schema)."
+    },
+    {
+      "name": "references-plan-documents",
+      "description": "Response references at least one of the plan documents under docs/plans/ (the design or task-breakdown plan)."
+    },
+    {
+      "name": "specific-recommended-starting-point",
+      "description": "The 'Recommended starting point' section names a concrete first action — a specific file plus a specific thing to do in it (e.g., 'add FeatureFlag model to schemas.py') — not generic advice like 'start implementing the schema'."
+    },
+    {
+      "name": "no-generic-engineering-advice",
+      "description": "Response does NOT include generic instructions like 'remember to write tests', 'consider edge cases', or 'follow good practices' that aren't grounded in the script output."
+    }
+  ]
+}

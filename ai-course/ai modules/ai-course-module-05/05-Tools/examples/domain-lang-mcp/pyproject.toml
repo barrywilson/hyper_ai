@@ -1,0 +1,31 @@
+[project]
+name = "domain-lang-mcp"
+version = "0.1.0"
+description = "Reference MCP servers (stdio + HTTP) wrapping the knowledge-graph backend"
+requires-python = ">=3.13"
+dependencies = [
+    "mcp>=1.0",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+]
+
+[project.scripts]
+domain-lang-mcp-stdio = "stdio_server.main:main"
+domain-lang-mcp-http  = "http_server.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["stdio_server", "http_server"]
+
+[tool.pytest.ini_options]
+testpaths = ["stdio_server", "http_server"]
+python_files = ["*_test.py"]
+asyncio_mode = "auto"

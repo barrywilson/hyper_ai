@@ -1,0 +1,39 @@
+{
+  "eval_id": 1,
+  "eval_name": "feature-description-aligned",
+  "run": "with_skill",
+  "expectations": [
+    {
+      "text": "uses-four-section-structure",
+      "passed": true,
+      "evidence": "all four sections present in correct order"
+    },
+    {
+      "text": "scope-includes-schemas-py",
+      "passed": true,
+      "evidence": "mentions svc/api/schemas.py"
+    },
+    {
+      "text": "scope-includes-schemas-test",
+      "passed": true,
+      "evidence": "mentions svc/api/schemas_test.py"
+    },
+    {
+      "text": "references-plan-documents",
+      "passed": true,
+      "evidence": "references docs/plans/"
+    },
+    {
+      "text": "specific-recommended-starting-point",
+      "passed": true,
+      "evidence": "file=True action_verb=True"
+    },
+    {
+      "text": "no-generic-engineering-advice",
+      "passed": true,
+      "evidence": "no generic phrases found"
+    }
+  ],
+  "passed": 6,
+  "total": 6
+}

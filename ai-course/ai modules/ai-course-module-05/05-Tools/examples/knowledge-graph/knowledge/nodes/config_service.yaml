@@ -1,0 +1,84 @@
+nodes:
+  - id: application
+    type: domain_term
+    area: config_service
+    name: Application
+    definition: >
+      A managed unit identified by a unique application ID. The Configuration API
+      stores configuration scoped to applications.
+    aliases:
+      - app
+      - tenant
+    warnings:
+      - Application IDs are case-sensitive and must be unique across the system.
+    source_files:
+      - svc/api/applications.py
+      - svc/models/application.py
+    documentation:
+      - docs/ABOUT.md
+      - docs/ARCHITECTURE.md
+
+  - id: configuration_item
+    type: domain_term
+    area: config_service
+    name: ConfigurationItem
+    definition: >
+      A key/value pair scoped to an Application and an Environment. The atomic
+      unit of configuration in the system.
+    aliases:
+      - config item
+      - config entry
+    warnings:
+      - Do not confuse with FeatureFlag - configuration items are static values
+        the application reads, whereas feature flags are evaluated at request time.
+    source_files:
+      - svc/api/config.py
+      - svc/models/config_item.py
+    documentation:
+      - docs/ABOUT.md
+
+  - id: environment
+    type: domain_term
+    area: config_service
+    name: Environment
+    definition: >
+      A named runtime context (e.g. 'dev', 'staging', 'prod') that configuration
+      and feature-flag values are bound to.
+    aliases:
+      - env
+    warnings:
+      - Environment names are conventional, not enforced. Coordinate with
+        operations before introducing a new one.
+    source_files:
+      - svc/models/environment.py
+    documentation:
+      - docs/ABOUT.md
+
+  - id: schema
+    type: domain_term
+    area: config_service
+    name: Schema
+    definition: >
+      An optional JSON Schema that validates the shape of ConfigurationItem values
+      for a given Application. Schemas are versioned per application.
+    aliases:
+      - config schema
+    source_files:
+      - svc/api/schemas.py
+      - svc/models/schema.py
+    documentation:
+      - docs/ARCHITECTURE.md
+
+  - id: health_status
+    type: domain_term
+    area: config_service
+    name: HealthStatus
+    definition: >
+      The combined liveness/readiness signal exposed at /health. Used by clients
+      to determine whether the service is accepting traffic.
+    aliases:
+      - health
+    source_files:
+      - svc/api/health.py
+    documentation:
+      - docs/ARCHITECTURE.md

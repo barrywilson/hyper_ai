@@ -1,0 +1,40 @@
+edges:
+  - from: application
+    to: configuration_item
+    relationship: owns
+
+  - from: application
+    to: schema
+    relationship: owns
+
+  - from: configuration_item
+    to: environment
+    relationship: scoped_to
+
+  - from: configuration_item
+    to: schema
+    relationship: validated_by
+
+  - from: configuration_item
+    to: feature_flag
+    relationship: not_equivalent_to
+
+  - from: feature_flag
+    to: flag_scope
+    relationship: has
+
+  - from: feature_flag
+    to: flag_environment_binding
+    relationship: has
+
+  - from: feature_flag
+    to: application
+    relationship: scoped_to
+
+  - from: flag_environment_binding
+    to: environment
+    relationship: scoped_to
+
+  - from: health_status
+    to: application
+    relationship: monitors

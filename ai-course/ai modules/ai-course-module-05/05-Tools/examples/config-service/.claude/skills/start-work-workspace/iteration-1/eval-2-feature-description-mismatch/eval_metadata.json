@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "feature-description-mismatch",
+  "prompt": "/start-work I'm going to add Redis caching to the config API — should be keyed by app ID.",
+  "assertions": [
+    {
+      "name": "flags-mismatch-explicitly",
+      "description": "Response explicitly surfaces that the user's stated intent (Redis caching) does not match the active work item (feature flags). The mismatch must be in plain prose — not buried in a list of generic concerns."
+    },
+    {
+      "name": "names-active-work-item",
+      "description": "Response names the actual active work item — feature flags, work item 001, or docs/001-feature-flags.md — when surfacing the mismatch."
+    },
+    {
+      "name": "asks-or-suggests-decision-on-mismatch",
+      "description": "Response either asks the user how to proceed (pivot/parallel/sub-task) or recommends a specific path before any caching implementation — does not silently produce a caching plan as if the workflow status didn't exist."
+    },
+    {
+      "name": "uses-four-section-structure",
+      "description": "Response contains all four required H2 sections: 'Where we are', 'Scope', 'Watch out for', 'Recommended starting point'."
+    },
+    {
+      "name": "honest-about-empty-scope",
+      "description": "Since no Redis or caching code exists in the repo, the 'Scope' section either lists no files-to-modify or only lists candidate hook points (e.g., main.py for middleware) — it must NOT invent files like 'cache.py' or 'redis_client.py' as if they existed."
+    }
+  ]
+}
